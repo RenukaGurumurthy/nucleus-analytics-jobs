@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.gooru.migration.ConnectionProvider
+Created-By: Gooru.org
+
