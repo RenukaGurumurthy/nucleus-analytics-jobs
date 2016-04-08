@@ -11,7 +11,7 @@ import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class EventMigration {
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
-	private static CassandraConnectionProvider cassandraConnectionProvider = CassandraConnectionProvider.instance();
+	private static ConnectionProvider cassandraConnectionProvider = ConnectionProvider.instance();
 	private static String EVENT_TIMIELINE = "event_timelinge";
 	private static String EVENT_DETAIL = "event_detail";
 	private static PreparedStatement insertEvents = (cassandraConnectionProvider.getAnalyticsCassandraSession())
@@ -23,7 +23,7 @@ public class EventMigration {
 
 		try {
 			String start = args[0];
-			String end = args[0];
+			String end = args[1];
 
 			Long startTime = minuteDateFormatter.parse(start).getTime();
 			System.out.println("startTime : " + start);

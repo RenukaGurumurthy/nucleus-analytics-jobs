@@ -16,7 +16,7 @@ import com.netflix.astyanax.model.ColumnList;
 import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class StatDataMigration {
-	private static CassandraConnectionProvider cassandraConnectionProvider = CassandraConnectionProvider.instance();
+	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final String STAT_PUBLISHER_QUEUE = "stat_publisher_queue";
 	private static final String METRICS = "metrics";
 	private static final String VIEWS = "views";
@@ -34,11 +34,11 @@ public class StatDataMigration {
 	private static final long JOB_DELAY = 0;
 	private static final long JOB_INTERVAL = 5000; // 1 Mintue
 
-	private static PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = cassandraConnectionProvider
+	private static PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = connectionProvider
 			.getAnalyticsCassandraSession().prepare(
 					"UPDATE statistical_data SET metrics_value = metrics_value+? WHERE clustering_key = ? AND metrics_name = ?");
 
-	private static PreparedStatement SELECT_STATISTICAL_COUNTER_DATA = cassandraConnectionProvider
+	private static PreparedStatement SELECT_STATISTICAL_COUNTER_DATA = connectionProvider
 			.getAnalyticsCassandraSession().prepare(
 					"SELECT metrics_value AS metrics FROM statistical_data WHERE clustering_key = ? AND metrics_name = ?");
 
@@ -82,10 +82,10 @@ public class StatDataMigration {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(cassandraConnectionProvider.getNewKeyspaceName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
 		} catch (Exception e) {
@@ -98,10 +98,10 @@ public class StatDataMigration {
 		try {
 			System.out.println("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
-					.from(cassandraConnectionProvider.getNewKeyspaceName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			resultSetFuture.get();
 		} catch (Exception e) {
@@ -112,8 +112,8 @@ public class StatDataMigration {
 	private static ColumnList<String> getStatMetrics(String gooruOid) {
 		ColumnList<String> result = null;
 		try {
-			result = cassandraConnectionProvider.getCassandraKeyspace()
-					.prepareQuery(cassandraConnectionProvider.accessColumnFamily("live_dashboard"))
+			result = connectionProvider.getCassandraKeyspace()
+					.prepareQuery(connectionProvider.accessColumnFamily("live_dashboard"))
 					.setConsistencyLevel(com.netflix.astyanax.model.ConsistencyLevel.CL_QUORUM)
 					.withRetryPolicy(new ConstantBackoff(2000, 5)).getKey("all~" + gooruOid).execute().getResult();
 
@@ -127,7 +127,7 @@ public class StatDataMigration {
 		try {
 			BoundStatement boundStatement = new BoundStatement(UPDATE_STATISTICAL_COUNTER_DATA);
 			boundStatement.bind(metricsValue, clusteringKey, metricsName);
-			cassandraConnectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
+			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
 		} catch (Exception e) {
 			return false;
 		}
@@ -138,13 +138,13 @@ public class StatDataMigration {
 		try {
 			BoundStatement selectBoundStatement = new BoundStatement(SELECT_STATISTICAL_COUNTER_DATA);
 			selectBoundStatement.bind(clusteringKey, metricsName);
-			ResultSetFuture resultFuture = cassandraConnectionProvider.getAnalyticsCassandraSession()
+			ResultSetFuture resultFuture = connectionProvider.getAnalyticsCassandraSession()
 					.executeAsync(selectBoundStatement);
 			ResultSet result = resultFuture.get();
 
 			BoundStatement boundStatement = new BoundStatement(UPDATE_STATISTICAL_COUNTER_DATA);
 			boundStatement.bind((result.one().getLong(METRICS) - metricsValue), clusteringKey, metricsName);
-			cassandraConnectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
+			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
 		} catch (Exception e) {
 			return false;
 		}

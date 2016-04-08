@@ -17,11 +17,10 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 import kafka.producer.KeyedMessage;
 
 public class StatMetricsPublisher {
-	private static KafkaConnectionProvider kafkaConnectionProvider = KafkaConnectionProvider.instance();
-	private static CassandraConnectionProvider cassandraConnectionProvider = CassandraConnectionProvider.instance();
+	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final String STATISTICAL_DATA = "statistical_data";
 	private static final String STAT_PUBLISHER_QUEUE = "stat_publisher_queue";
-	private static final String KAFKA_QUEUE_TOPIC = "test";
+	private static final String KAFKA_QUEUE_TOPIC = connectionProvider.getMetricsPublisherQueueTopic();
 	private static final String _CLUSTERING_KEY = "clustering_key";
 	private static final String _METRICS_NAME = "metrics_name";
 	private static final String _METRICS_VALUE = "metrics_value";
@@ -52,7 +51,7 @@ public class StatMetricsPublisher {
 				}
 				KeyedMessage<String, String> data = new KeyedMessage<String, String>(KAFKA_QUEUE_TOPIC,
 						jArray.toString());
-				(kafkaConnectionProvider.getPublisher()).send(data);
+				(connectionProvider.getKafkaProducer().getPublisher()).send(data);
 				System.out.println("Statistical data publishing completed by " + new Date());
 			}
 		};
@@ -63,9 +62,9 @@ public class StatMetricsPublisher {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(cassandraConnectionProvider.getNewKeyspaceName(), STATISTICAL_DATA)
+					.from(connectionProvider.getAnalyticsCassandraName(), STATISTICAL_DATA)
 					.where(QueryBuilder.eq(_CLUSTERING_KEY, gooruOids)).setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
 		} catch (Exception e) {
@@ -78,10 +77,10 @@ public class StatMetricsPublisher {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(cassandraConnectionProvider.getNewKeyspaceName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
 		} catch (Exception e) {
@@ -94,10 +93,10 @@ public class StatMetricsPublisher {
 		try {
 			System.out.println("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
-					.from(cassandraConnectionProvider.getNewKeyspaceName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			resultSetFuture.get();
 		} catch (Exception e) {
