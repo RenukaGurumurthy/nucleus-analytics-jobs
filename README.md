@@ -16,4 +16,4 @@ Once the far Jar is created, it could be run as any other Java application.
 
 Following command could be used, from the base directory.
 
-> java -classpath build/libs/migration-scripts-fat.jar: org.gooru.migration.StatDataMigration
+> java -classpath build/libs/migration-scripts-fat.jar: org.gooru.migration.jobs.StatDataMigration
