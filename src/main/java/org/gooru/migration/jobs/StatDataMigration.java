@@ -1,7 +1,9 @@
-package org.gooru.migration;
+package org.gooru.migration.jobs;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.gooru.migration.connections.ConnectionProvider;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.ConsistencyLevel;

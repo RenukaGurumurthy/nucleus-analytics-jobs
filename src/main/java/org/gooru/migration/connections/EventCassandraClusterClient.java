@@ -1,4 +1,4 @@
-package org.gooru.migration;
+package org.gooru.migration.connections;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -7,16 +7,14 @@ import com.datastax.driver.core.policies.DefaultRetryPolicy;
 import com.datastax.driver.core.policies.ExponentialReconnectionPolicy;
 import com.datastax.driver.core.policies.TokenAwarePolicy;
 
-public final class AnalyticsUsageCassandraClusterClient {
+public final class EventCassandraClusterClient {
 
 	private static Session session = null;
+	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 
-	AnalyticsUsageCassandraClusterClient(String host, String datacenter, String clusterName, String keyspaceName) {
-		initializeCluster(host, datacenter, clusterName, keyspaceName);
-	}
-
-	public AnalyticsUsageCassandraClusterClient() {
-		this(null, null, null, null);
+	EventCassandraClusterClient() {
+		initializeCluster(configSettingsLoader.getEventCassSeeds(), configSettingsLoader.getEventCassDatacenter(),
+				configSettingsLoader.getEventCassCluster(), configSettingsLoader.getEventCassKeyspace());
 	}
 
 	private static void initializeCluster(String host, String datacenter, String clusterName, String keyspaceName) {
@@ -31,11 +29,11 @@ public final class AnalyticsUsageCassandraClusterClient {
 		return session;
 	}
 
-	private static class AnalyticsUsageCassandraClusterClientHolder {
-		public static final AnalyticsUsageCassandraClusterClient INSTANCE = new AnalyticsUsageCassandraClusterClient();
+	private static class EventCassandraClusterClientHolder {
+		public static final EventCassandraClusterClient INSTANCE = new EventCassandraClusterClient();
 	}
 
-	public static AnalyticsUsageCassandraClusterClient instance() {
-		return AnalyticsUsageCassandraClusterClientHolder.INSTANCE;
+	public static EventCassandraClusterClient instance() {
+		return EventCassandraClusterClientHolder.INSTANCE;
 	}
 }

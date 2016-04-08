@@ -1,7 +1,9 @@
-package org.gooru.migration;
+package org.gooru.migration.jobs;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.gooru.migration.connections.ConnectionProvider;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
@@ -11,12 +13,12 @@ import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class EventMigration {
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
-	private static ConnectionProvider cassandraConnectionProvider = ConnectionProvider.instance();
+	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static String EVENT_TIMIELINE = "event_timelinge";
 	private static String EVENT_DETAIL = "event_detail";
-	private static PreparedStatement insertEvents = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+	private static PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
 			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
-	private static PreparedStatement insertEventTimeLine = (cassandraConnectionProvider.getAnalyticsCassandraSession())
+	private static PreparedStatement insertEventTimeLine = (connectionProvider.getAnalyticsCassandraSession())
 			.prepare("INSERT INTO events_timeline(event_time,event_id)VALUES(?,?);");
 
 	public static void main(String args[]) {
@@ -65,8 +67,8 @@ public class EventMigration {
 
 		ColumnList<String> result = null;
 		try {
-			result = (cassandraConnectionProvider.getCassandraKeyspace())
-					.prepareQuery(cassandraConnectionProvider.accessColumnFamily(cfName))
+			result = (connectionProvider.getCassandraKeyspace())
+					.prepareQuery(connectionProvider.accessColumnFamily(cfName))
 					.setConsistencyLevel(ConsistencyLevel.CL_QUORUM).withRetryPolicy(new ConstantBackoff(2000, 5))
 					.getKey(key).execute().getResult();
 
@@ -81,7 +83,7 @@ public class EventMigration {
 		try {
 			BoundStatement boundStatement = new BoundStatement(preparedStatement);
 			boundStatement.bind(key, column);
-			(cassandraConnectionProvider.getAnalyticsCassandraSession()).executeAsync(boundStatement);
+			(connectionProvider.getAnalyticsCassandraSession()).executeAsync(boundStatement);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

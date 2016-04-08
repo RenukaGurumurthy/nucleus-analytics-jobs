@@ -55,7 +55,7 @@ apply plugin: 'java'
  shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'org.gooru.migration.ConnectionProvider'
+        attributes 'Main-Class': 'org.gooru.migration.connections.ConnectionProvider'
         attributes 'Created-By' : 'Gooru.org'
     }
 }

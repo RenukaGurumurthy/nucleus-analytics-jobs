@@ -1,4 +1,4 @@
-package org.gooru.migration;
+package org.gooru.migration.connections;
 
 import com.netflix.astyanax.AstyanaxContext;
 import com.netflix.astyanax.Keyspace;
@@ -12,13 +12,11 @@ import com.netflix.astyanax.thrift.ThriftFamilyFactory;
 public final class ArchivedCassandraClusterClient {
 
 	private static Keyspace cassandraKeyspace = null;
+	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 
-	ArchivedCassandraClusterClient(String host, String datacenter, String clusterName, String keyspaceName) {
-		initializeCluster(host, datacenter, clusterName, keyspaceName);
-	}
-
-	public ArchivedCassandraClusterClient() {
-		this(null, null, null, null);
+	ArchivedCassandraClusterClient() {
+		initializeCluster(configSettingsLoader.getArchivedCassSeeds(), configSettingsLoader.getArchivedCassDatacenter(),
+				configSettingsLoader.getArchivedCassCluster(), configSettingsLoader.getArchivedCassKeyspace());
 	}
 
 	public static void initializeCluster(String host, String datacenter, String clusterName, String keyspaceName) {

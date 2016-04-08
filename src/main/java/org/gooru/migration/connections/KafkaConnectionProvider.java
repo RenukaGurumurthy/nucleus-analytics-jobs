@@ -1,4 +1,4 @@
-package org.gooru.migration;
+package org.gooru.migration.connections;
 
 import java.util.Properties;
 
@@ -6,15 +6,12 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.ProducerConfig;
 
 public class KafkaConnectionProvider {
+
 	private static Producer<String, String> producer = null;
+	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 
 	KafkaConnectionProvider() {
-		this(null);
-
-	}
-
-	KafkaConnectionProvider(String brokers) {
-		initializeKafkaConnection(brokers);
+		initializeKafkaConnection(configSettingsLoader.getKakaBrokers());
 	}
 
 	private static class KafkaConnectionHolder {
