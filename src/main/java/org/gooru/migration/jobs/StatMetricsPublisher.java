@@ -28,11 +28,11 @@ public class StatMetricsPublisher {
 	private static final String GOORU_OID = "gooruOid";
 	private static final String _GOORU_OID = "gooru_oid";
 	private static final String PUBLISH_METRICS = "publishMetrics";
-	private static final int QUEUE_LIMIT = 10;
+	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatPublisherQueueLimit();
 
 	private static Timer timer = new Timer();
 	private static long JOB_DELAY = 0;
-	private static long JOB_INTERVAL = 60000; // 1 Mintue
+	private static long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatPublisherInterval();
 
 	public static void main(String arg[]) {
 		TimerTask task = new TimerTask() {

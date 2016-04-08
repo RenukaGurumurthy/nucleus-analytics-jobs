@@ -62,4 +62,8 @@ public final class ConnectionProvider {
 	public String getMetricsPublisherQueueTopic() {
 		return configSettingsLoader.getKakaBrokers();
 	}
+
+	public ConfigSettingsLoader getConfigsettingsloader() {
+		return configSettingsLoader;
+	}
 }

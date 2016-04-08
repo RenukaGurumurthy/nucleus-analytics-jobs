@@ -25,7 +25,7 @@ public class StatDataMigration {
 	private static final String _METRICS_NAME = "metrics_name";
 	private static final String _GOORU_OID = "gooru_oid";
 	private static final String MIGRATE_METRICS = "migrateMetrics";
-	private static final int QUEUE_LIMIT = 10;
+	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatMigrationQueueLimit();
 	private static final String COUNT_VIEWS = "count~views";
 	private static final String TIME_SPENT_TOTAL = "time_spent~total";
 	private static final String COUNT_COPY = "count~copy";
@@ -34,7 +34,7 @@ public class StatDataMigration {
 
 	private static final Timer timer = new Timer();
 	private static final long JOB_DELAY = 0;
-	private static final long JOB_INTERVAL = 5000; // 1 Mintue
+	private static final long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatMigrationInterval();
 
 	private static PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = connectionProvider
 			.getAnalyticsCassandraSession().prepare(

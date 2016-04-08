@@ -27,6 +27,11 @@ public final class ConfigSettingsLoader {
 
 	private static String kakaBrokers = null;
 
+	private static int statMigrationQueueLimit = 0;
+	private static long statMigrationInterval = 0L;
+	private static int statPublisherQueueLimit = 0;
+	private static long statPublisherInterval = 0L;
+	
 	ConfigSettingsLoader() {
 		loadConfigSettings();
 
@@ -44,8 +49,13 @@ public final class ConfigSettingsLoader {
 		eventCassDatacenter = configConstants.getProperty("event.cassandra.datacenter", "datacenter1");
 		eventCassCluster = configConstants.getProperty("event.cassandra.cluster", "cassandra");
 		eventCassKeyspace = configConstants.getProperty("event.cassandra.keyspace", "event_logger_insights");
-
+		
 		kakaBrokers = configConstants.getProperty("kafka.brokers", "127.0.0.1:9092");
+		
+		statMigrationQueueLimit = (int) configConstants.get("stat.migration.queue.limit");
+		statMigrationInterval = (long) configConstants.get("stat.migration.delay");
+		statPublisherQueueLimit = (int) configConstants.get("stat.publisher.queue.limit");
+		statPublisherInterval = (long) configConstants.get("stat.publisher.delay");
 	}
 
 	private static class ConfigSettingsHolder {
@@ -123,5 +133,21 @@ public final class ConfigSettingsLoader {
 
 	public String getKakaBrokers() {
 		return kakaBrokers;
+	}
+
+	public int getStatMigrationQueueLimit() {
+		return statMigrationQueueLimit;
+	}
+
+	public long getStatMigrationInterval() {
+		return statMigrationInterval;
+	}
+
+	public int getStatPublisherQueueLimit() {
+		return statPublisherQueueLimit;
+	}
+
+	public long getStatPublisherInterval() {
+		return statPublisherInterval;
 	}
 }
