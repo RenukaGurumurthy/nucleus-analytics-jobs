@@ -15,7 +15,7 @@ public final class ConnectionProvider {
 			.instance();
 	private static final ArchivedCassandraClusterClient archivedCassandraClusterClient = ArchivedCassandraClusterClient
 			.instance();
-	private static final KafkaConnectionProvider kafkaConnectionProvider = KafkaConnectionProvider.instance();
+	private static final KafkaClusterClient kafkaConnectionProvider = KafkaClusterClient.instance();
 
 	public Session getAnalyticsCassandraSession() {
 		return analyticsUsageCassandraClusterClient.getCassandraSession();
@@ -29,7 +29,7 @@ public final class ConnectionProvider {
 		return archivedCassandraClusterClient.getCassandraKeyspace();
 	}
 
-	public KafkaConnectionProvider getKafkaProducer() {
+	public KafkaClusterClient getKafkaProducer() {
 		return kafkaConnectionProvider;
 	}
 

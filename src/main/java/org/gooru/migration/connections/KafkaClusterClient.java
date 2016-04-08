@@ -5,20 +5,20 @@ import java.util.Properties;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.ProducerConfig;
 
-public class KafkaConnectionProvider {
+public class KafkaClusterClient {
 
 	private static Producer<String, String> producer = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 
-	KafkaConnectionProvider() {
+	KafkaClusterClient() {
 		initializeKafkaConnection(configSettingsLoader.getKakaBrokers());
 	}
 
 	private static class KafkaConnectionHolder {
-		public static final KafkaConnectionProvider INSTANCE = new KafkaConnectionProvider();
+		public static final KafkaClusterClient INSTANCE = new KafkaClusterClient();
 	}
 
-	public static KafkaConnectionProvider instance() {
+	public static KafkaClusterClient instance() {
 		return KafkaConnectionHolder.INSTANCE;
 	}
 
