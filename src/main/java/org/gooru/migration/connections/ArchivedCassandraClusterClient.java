@@ -1,5 +1,8 @@
 package org.gooru.migration.connections;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.netflix.astyanax.AstyanaxContext;
 import com.netflix.astyanax.Keyspace;
 import com.netflix.astyanax.connectionpool.NodeDiscoveryType;
@@ -13,7 +16,8 @@ public final class ArchivedCassandraClusterClient {
 
 	private static Keyspace cassandraKeyspace = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
-
+	private static final Logger LOG = LoggerFactory.getLogger(ArchivedCassandraClusterClient.class);
+	
 	ArchivedCassandraClusterClient() {
 		initializeCluster(configSettingsLoader.getArchivedCassSeeds(), configSettingsLoader.getArchivedCassDatacenter(),
 				configSettingsLoader.getArchivedCassCluster(), configSettingsLoader.getArchivedCassKeyspace());
@@ -34,7 +38,7 @@ public final class ArchivedCassandraClusterClient {
 				.buildKeyspace(ThriftFamilyFactory.getInstance());
 		context.start();
 		cassandraKeyspace = (Keyspace) context.getClient();
-
+		LOG.info("Archieved Cassandra initialized successfully");
 	}
 
 	public Keyspace getCassandraKeyspace() {

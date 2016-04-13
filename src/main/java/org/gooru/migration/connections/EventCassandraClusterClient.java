@@ -1,5 +1,8 @@
 package org.gooru.migration.connections;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
@@ -11,7 +14,8 @@ public final class EventCassandraClusterClient {
 
 	private static Session session = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
-
+	private static final Logger LOG = LoggerFactory.getLogger(EventCassandraClusterClient.class);
+	
 	EventCassandraClusterClient() {
 		initializeCluster(configSettingsLoader.getEventCassSeeds(), configSettingsLoader.getEventCassDatacenter(),
 				configSettingsLoader.getEventCassCluster(), configSettingsLoader.getEventCassKeyspace());
@@ -23,6 +27,7 @@ public final class EventCassandraClusterClient {
 				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000))
 				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(datacenter))).build();
 		session = cluster.connect(keyspaceName);
+		LOG.info("Event Cassandra Cluster Initialized successfully..");
 	}
 
 	public Session getCassandraSession() {

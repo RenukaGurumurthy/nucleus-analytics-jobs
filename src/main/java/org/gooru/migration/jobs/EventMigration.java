@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.gooru.migration.connections.ConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.PreparedStatement;
@@ -12,9 +14,10 @@ import com.netflix.astyanax.model.ConsistencyLevel;
 import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class EventMigration {
+	private static final Logger LOG = LoggerFactory.getLogger(EventMigration.class);
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
-	private static String EVENT_TIMIELINE = "event_timelinge";
+	private static String EVENT_TIMIELINE = "event_timeline";
 	private static String EVENT_DETAIL = "event_detail";
 	private static PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
 			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
@@ -28,15 +31,15 @@ public class EventMigration {
 			String end = args[1];
 
 			Long startTime = minuteDateFormatter.parse(start).getTime();
-			System.out.println("startTime : " + start);
+			LOG.info("startTime : " + start);
 			Long endTime = minuteDateFormatter.parse(end).getTime();
-			System.out.println("endTime : " + end);
+			LOG.info("endTime : " + end);
 			// String start = "201508251405";
 			// Long endTime = new Date().getTime();
 
 			for (Long startDate = startTime; startDate < endTime;) {
 				String currentDate = minuteDateFormatter.format(new Date(startDate));
-				System.out.println("Running for :" + currentDate);
+				LOG.info("Running for :" + currentDate);
 				// Incrementing time - one minute
 				ColumnList<String> et = readWithKey(EVENT_TIMIELINE, currentDate);
 				for (String eventId : et.getColumnNames()) {
@@ -51,13 +54,11 @@ public class EventMigration {
 			}
 		} catch (Exception e) {
 			if (e instanceof ArrayIndexOutOfBoundsException) {
-				System.out.println("startTime or endTime can not be null. Please make sure the class execution format as below.");
-				System.out.println(
-						"java -classpath migration-scripts-fat.jar org.gooru.migration.EventMigration 201508251405 201508251410");
-				System.out.println();
+				LOG.info("startTime or endTime can not be null. Please make sure the class execution format as below.");
+				LOG.info(
+						"java -classpath build/libs/migration-scripts-fat.jar: org.gooru.migration.jobs.EventMigration 201508251405 201508251410");
 			} else {
-				System.out.println("Something went wrong.");
-				e.printStackTrace();
+				LOG.error("Something went wrong...");
 			}
 			System.exit(500);
 		}

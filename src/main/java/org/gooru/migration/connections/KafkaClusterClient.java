@@ -2,6 +2,9 @@ package org.gooru.migration.connections;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import kafka.javaapi.producer.Producer;
 import kafka.producer.ProducerConfig;
 
@@ -9,9 +12,10 @@ public class KafkaClusterClient {
 
 	private static Producer<String, String> producer = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
-
+	private static final Logger LOG = LoggerFactory.getLogger(KafkaClusterClient.class);
 	KafkaClusterClient() {
 		initializeKafkaConnection(configSettingsLoader.getKakaBrokers());
+		LOG.info("Kafka Cluster initialized successfully..");
 	}
 
 	private static class KafkaConnectionHolder {

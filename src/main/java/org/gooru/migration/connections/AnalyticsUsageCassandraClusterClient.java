@@ -1,5 +1,8 @@
 package org.gooru.migration.connections;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
@@ -11,7 +14,8 @@ public final class AnalyticsUsageCassandraClusterClient {
 
 	private static Session session = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
-
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsUsageCassandraClusterClient.class);
+	
 	public AnalyticsUsageCassandraClusterClient() {
 		initializeCluster();
 	}
@@ -25,6 +29,7 @@ public final class AnalyticsUsageCassandraClusterClient {
 						new DCAwareRoundRobinPolicy(configSettingsLoader.getAnalyticsCassDatacenter())))
 				.build();
 		session = cluster.connect(configSettingsLoader.getAnalyticsCassKeyspace());
+		LOG.info("Analytics Cassandra initialized successfully...");
 	}
 
 	public Session getCassandraSession() {

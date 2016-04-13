@@ -1,15 +1,16 @@
 package org.gooru.migration.connections;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ConfigSettingsLoader {
 	private static Properties configConstants = new Properties();
-
+	private static final Logger LOG = LoggerFactory.getLogger(ConfigSettingsLoader.class);
 	private static String analyticsCassKeyspace = null;
 	private static String analyticsCassSeeds = null;
 	private static String analyticsCassDatacenter = null;
@@ -25,7 +26,7 @@ public final class ConfigSettingsLoader {
 	private static String archivedCassDatacenter = null;
 	private static String archivedCassCluster = null;
 
-	private static String kakaBrokers = null;
+	private static String kafkaBrokers = null;
 
 	private static int statMigrationQueueLimit = 0;
 	private static long statMigrationInterval = 0L;
@@ -50,12 +51,12 @@ public final class ConfigSettingsLoader {
 		eventCassCluster = configConstants.getProperty("event.cassandra.cluster", "cassandra");
 		eventCassKeyspace = configConstants.getProperty("event.cassandra.keyspace", "event_logger_insights");
 		
-		kakaBrokers = configConstants.getProperty("kafka.brokers", "127.0.0.1:9092");
+		kafkaBrokers = configConstants.getProperty("kafka.brokers", "127.0.0.1:9092");
 		
-		statMigrationQueueLimit = (int) configConstants.get("stat.migration.queue.limit");
-		statMigrationInterval = (long) configConstants.get("stat.migration.delay");
-		statPublisherQueueLimit = (int) configConstants.get("stat.publisher.queue.limit");
-		statPublisherInterval = (long) configConstants.get("stat.publisher.delay");
+		statMigrationQueueLimit = Integer.parseInt((String) configConstants.get("stat.migration.queue.limit"));
+		statMigrationInterval = Long.parseLong((String) configConstants.get("stat.migration.delay"));
+		statPublisherQueueLimit = Integer.parseInt((String) configConstants.get("stat.publisher.queue.limit"));
+		statPublisherInterval = Long.parseLong((String)configConstants.get("stat.publisher.delay"));
 	}
 
 	private static class ConfigSettingsHolder {
@@ -74,8 +75,8 @@ public final class ConfigSettingsLoader {
 			inputStream = FileUtils.openInputStream(new File(configPath.concat(propFileName)));
 			configConstants.load(inputStream);
 			inputStream.close();
-		} catch (IOException ioException) {
-			ioException.printStackTrace();
+		} catch (Exception e) {
+			LOG.error("Error while loading config properties." , e);
 		}
 	}
 
@@ -132,7 +133,7 @@ public final class ConfigSettingsLoader {
 	}
 
 	public String getKakaBrokers() {
-		return kakaBrokers;
+		return kafkaBrokers;
 	}
 
 	public int getStatMigrationQueueLimit() {

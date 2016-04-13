@@ -4,6 +4,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.gooru.migration.connections.ConnectionProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.ConsistencyLevel;
@@ -18,6 +20,7 @@ import com.netflix.astyanax.model.ColumnList;
 import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class StatDataMigration {
+	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final String STAT_PUBLISHER_QUEUE = "stat_publisher_queue";
 	private static final String METRICS = "metrics";
@@ -45,9 +48,8 @@ public class StatDataMigration {
 					"SELECT metrics_value AS metrics FROM statistical_data WHERE clustering_key = ? AND metrics_name = ?");
 
 	public static void main(String args[]) throws InterruptedException {
-		System.out.println("Please make sure that we have loaded list of content oids in stat_publisher_queue column family.");
-		System.out.println("Press Ctrl+C if you want to kill process from job executed location.");
-		System.out.println();
+		LOG.info("Please make sure that we have loaded list of content oids in stat_publisher_queue column family.");
+		LOG.info("Press Ctrl+C if you want to kill process from job executed location.");
 		Thread.sleep(10000);
 		
 		TimerTask task = new TimerTask() {
@@ -70,7 +72,7 @@ public class StatDataMigration {
 							updateStatisticalCounterData(queue.getString(_GOORU_OID), COPY, statMetrics.getLongValue());
 							break;
 						default:
-							System.out.println("Unused metric: " + statMetrics.getName());
+							LOG.info("Unused metric: " + statMetrics.getName());
 						}
 					}
 					 deleteFromPublisherQueue(MIGRATE_METRICS,queue.getString(_GOORU_OID));
@@ -91,14 +93,14 @@ public class StatDataMigration {
 					.executeAsync(select);
 			result = resultSetFuture.get();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Error while reading publisher data into queue..", e);
 		}
 		return result;
 	}
 
 	private static void deleteFromPublisherQueue(String metricsName, String gooruOid) {
 		try {
-			System.out.println("Removing -" + gooruOid + "- from the statistical queue");
+			LOG.info("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
 					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
@@ -107,7 +109,7 @@ public class StatDataMigration {
 					.executeAsync(select);
 			resultSetFuture.get();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Error while reading publisher data into queue..", e);
 		}
 	}
 
@@ -120,7 +122,7 @@ public class StatDataMigration {
 					.withRetryPolicy(new ConstantBackoff(2000, 5)).getKey("all~" + gooruOid).execute().getResult();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Error while retrieve stat metrics..", e);
 		}
 		return result;
 	}
@@ -131,6 +133,7 @@ public class StatDataMigration {
 			boundStatement.bind(metricsValue, clusteringKey, metricsName);
 			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
 		} catch (Exception e) {
+			LOG.error("Error while update stat metrics..", e);
 			return false;
 		}
 		return true;
@@ -148,6 +151,7 @@ public class StatDataMigration {
 			boundStatement.bind((result.one().getLong(METRICS) - metricsValue), clusteringKey, metricsName);
 			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
 		} catch (Exception e) {
+			LOG.error("Error while balance stat metrics..", e);
 			return false;
 		}
 		return true;
