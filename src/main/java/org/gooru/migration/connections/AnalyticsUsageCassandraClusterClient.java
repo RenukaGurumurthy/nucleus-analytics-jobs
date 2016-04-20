@@ -24,10 +24,7 @@ public final class AnalyticsUsageCassandraClusterClient {
 		Cluster cluster = Cluster.builder().withClusterName(configSettingsLoader.getAnalyticsCassCluster())
 				.addContactPoint(configSettingsLoader.getAnalyticsCassSeeds())
 				.withRetryPolicy(DefaultRetryPolicy.INSTANCE)
-				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000))
-				.withLoadBalancingPolicy(new TokenAwarePolicy(
-						new DCAwareRoundRobinPolicy(configSettingsLoader.getAnalyticsCassDatacenter())))
-				.build();
+				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
 		session = cluster.connect(configSettingsLoader.getAnalyticsCassKeyspace());
 		LOG.info("Analytics Cassandra initialized successfully...");
 	}

@@ -28,7 +28,13 @@ public class StatMetricsPublisher {
 	private static final String _CLUSTERING_KEY = "clustering_key";
 	private static final String _METRICS_NAME = "metrics_name";
 	private static final String _METRICS_VALUE = "metrics_value";
-	private static final String GOORU_OID = "gooruOid";
+	private static final String TYPE = "type";
+	private static final String ID = "id";
+	private static final String VIEWS = "views";
+	private static final String VIEWS_COUNT = "viewsCount";
+	private static final String DATA = "data";
+	private static final String EVENT_NAME = "eventName";
+	private static final String VIEWS_UPDATE = "views.update";
 	private static final String _GOORU_OID = "gooru_oid";
 	private static final String PUBLISH_METRICS = "publishMetrics";
 	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatPublisherQueueLimit();
@@ -42,32 +48,40 @@ public class StatMetricsPublisher {
 			@Override
 			public void run() {
 				ResultSet queueSet = getPublisherQueue(PUBLISH_METRICS);
+				JSONObject statObject = new JSONObject();
 				JSONArray jArray = new JSONArray();
 				for (Row queue : queueSet) {
-					ResultSet resultSet = getStatMetrics(queue.getString(_GOORU_OID));
+					ResultSet resultSet = getStatMetrics(queue.getString(_GOORU_OID),VIEWS);
 					for (Row result : resultSet) {
 						JSONObject jObject = new JSONObject();
-						jObject.put(GOORU_OID, result.getString(_CLUSTERING_KEY));
-						jObject.put(result.getString(_METRICS_NAME), result.getLong(_METRICS_VALUE));
+						jObject.put(ID, result.getString(_CLUSTERING_KEY));
+						jObject.put(VIEWS_COUNT, result.getLong(_METRICS_VALUE));
+						jObject.put(TYPE, queue.getString(TYPE));
 						jArray.add(jObject);
 					}
 					 deleteFromPublisherQueue(PUBLISH_METRICS,queue.getString(_GOORU_OID));
 				}
-				KeyedMessage<String, String> data = new KeyedMessage<String, String>(KAFKA_QUEUE_TOPIC,
-						jArray.toString());
-				(connectionProvider.getKafkaProducer().getPublisher()).send(data);
-				LOG.info("Statistical data publishing completed by " + new Date());
+				statObject.put(EVENT_NAME, VIEWS_UPDATE);
+				statObject.put(DATA, jArray);
+				
+				if (!statObject.isEmpty()) {
+					LOG.info("message : " + statObject.toString());
+					KeyedMessage<String, String> data = new KeyedMessage<String, String>(KAFKA_QUEUE_TOPIC,
+							statObject.toString());
+					(connectionProvider.getKafkaProducer().getPublisher()).send(data);
+					LOG.info("Statistical data publishing completed by " + new Date());
+				}
 			}
 		};
 		timer.scheduleAtFixedRate(task, JOB_DELAY, JOB_INTERVAL);
 	}
 
-	private static ResultSet getStatMetrics(String gooruOids) {
+	private static ResultSet getStatMetrics(String gooruOids, String metricsName) {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
 					.from(connectionProvider.getAnalyticsCassandraName(), STATISTICAL_DATA)
-					.where(QueryBuilder.eq(_CLUSTERING_KEY, gooruOids)).setConsistencyLevel(ConsistencyLevel.QUORUM);
+					.where(QueryBuilder.eq(_CLUSTERING_KEY, gooruOids)).and(QueryBuilder.eq(_METRICS_NAME, metricsName)).setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
@@ -81,10 +95,10 @@ public class StatMetricsPublisher {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
 		} catch (Exception e) {
@@ -97,10 +111,10 @@ public class StatMetricsPublisher {
 		try {
 			LOG.info("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
-					.from(connectionProvider.getAnalyticsCassandraName(), STAT_PUBLISHER_QUEUE)
+					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
 					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
-			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
+			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession())
 					.executeAsync(select);
 			resultSetFuture.get();
 		} catch (Exception e) {

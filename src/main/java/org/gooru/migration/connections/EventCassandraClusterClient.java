@@ -24,8 +24,7 @@ public final class EventCassandraClusterClient {
 	private static void initializeCluster(String host, String datacenter, String clusterName, String keyspaceName) {
 		Cluster cluster = Cluster.builder().withClusterName(clusterName).addContactPoint(host)
 				.withRetryPolicy(DefaultRetryPolicy.INSTANCE)
-				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000))
-				.withLoadBalancingPolicy(new TokenAwarePolicy(new DCAwareRoundRobinPolicy(datacenter))).build();
+				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
 		session = cluster.connect(keyspaceName);
 		LOG.info("Event Cassandra Cluster Initialized successfully..");
 	}

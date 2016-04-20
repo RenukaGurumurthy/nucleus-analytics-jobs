@@ -37,7 +37,7 @@ dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.13'
     compile 'com.google.guava:guava:14.0.1'
-	compile 'com.datastax.cassandra:cassandra-driver-core:2.1.4'
+	compile 'com.datastax.cassandra:cassandra-driver-core:3.0.0'
 	compile 'com.netflix.astyanax:astyanax:3.9.0'
 	compile 'com.netflix.astyanax:astyanax-cassandra:3.9.0'
 	compile 'com.netflix.astyanax:astyanax-thrift:3.9.0'
