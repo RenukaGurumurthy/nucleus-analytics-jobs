@@ -64,8 +64,9 @@ public class StatMetricsPublisher {
 				statObject.put(EVENT_NAME, VIEWS_UPDATE);
 				statObject.put(DATA, jArray);
 				
-				if (!statObject.isEmpty()) {
+				if (!jArray.isEmpty()) {
 					LOG.info("message : " + statObject.toString());
+					LOG.info("KAFKA_QUEUE_TOPIC" + KAFKA_QUEUE_TOPIC);
 					KeyedMessage<String, String> data = new KeyedMessage<String, String>(KAFKA_QUEUE_TOPIC,
 							statObject.toString());
 					(connectionProvider.getKafkaProducer().getPublisher()).send(data);

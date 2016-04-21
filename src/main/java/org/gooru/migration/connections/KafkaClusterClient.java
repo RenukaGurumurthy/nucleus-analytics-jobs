@@ -30,6 +30,7 @@ public class KafkaClusterClient {
 		Properties props = new Properties();
 		props.put("metadata.broker.list", brokers);
 		props.put("serializer.class", "kafka.serializer.StringEncoder");
+		props.put("retry.backoff.ms", "1000");
 		props.put("request.required.acks", "1");
 		props.put("producer.type", "async");
 		ProducerConfig config = new ProducerConfig(props);

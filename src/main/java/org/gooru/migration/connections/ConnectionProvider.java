@@ -1,5 +1,7 @@
 package org.gooru.migration.connections;
 
+import org.elasticsearch.client.Client;
+
 import com.datastax.driver.core.Session;
 import com.netflix.astyanax.Keyspace;
 import com.netflix.astyanax.model.ColumnFamily;
@@ -16,6 +18,12 @@ public final class ConnectionProvider {
 	private static final ArchivedCassandraClusterClient archivedCassandraClusterClient = ArchivedCassandraClusterClient
 			.instance();
 	private static final KafkaClusterClient kafkaConnectionProvider = KafkaClusterClient.instance();
+
+	private static final ElasticsearchClusterClient elasticsearchClusterClient = ElasticsearchClusterClient.instance();
+
+	public Client getElsClient() {
+		return elasticsearchClusterClient.getElsClient();
+	}
 
 	public Session getAnalyticsCassandraSession() {
 		return analyticsUsageCassandraClusterClient.getCassandraSession();
@@ -60,7 +68,7 @@ public final class ConnectionProvider {
 	}
 
 	public String getMetricsPublisherQueueTopic() {
-		return configSettingsLoader.getKakaBrokers();
+		return configSettingsLoader.getStatPublisherTopic();
 	}
 
 	public ConfigSettingsLoader getConfigsettingsloader() {

@@ -27,11 +27,15 @@ public final class ConfigSettingsLoader {
 	private static String archivedCassCluster = null;
 
 	private static String kafkaBrokers = null;
-
+	
 	private static int statMigrationQueueLimit = 0;
 	private static long statMigrationInterval = 0L;
 	private static int statPublisherQueueLimit = 0;
 	private static long statPublisherInterval = 0L;
+	private static String statPublisherTopic = null;
+	
+	private static String elsCluster = null;
+	private static String elsHost = null;
 	
 	ConfigSettingsLoader() {
 		loadConfigSettings();
@@ -57,6 +61,10 @@ public final class ConfigSettingsLoader {
 		statMigrationInterval = Long.parseLong((String) configConstants.get("stat.migration.delay"));
 		statPublisherQueueLimit = Integer.parseInt((String) configConstants.get("stat.publisher.queue.limit"));
 		statPublisherInterval = Long.parseLong((String)configConstants.get("stat.publisher.delay"));
+		statPublisherTopic = (String) configConstants.get("metrics.publisher.topic");
+		
+		elsCluster = (String) configConstants.get("elasticsearch.cluster");
+		elsHost = (String) configConstants.get("elasticsearch.ip");
 	}
 
 	private static class ConfigSettingsHolder {
@@ -150,5 +158,14 @@ public final class ConfigSettingsLoader {
 
 	public long getStatPublisherInterval() {
 		return statPublisherInterval;
+	}
+	public String getStatPublisherTopic() {
+		return statPublisherTopic;
+	}
+	public String getElsCluster() {
+		return elsCluster;
+	}
+	public String getElsHost() {
+		return elsHost;
 	}
 }
