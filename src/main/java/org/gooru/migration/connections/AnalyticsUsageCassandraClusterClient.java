@@ -32,7 +32,9 @@ public final class AnalyticsUsageCassandraClusterClient {
 	public Session getCassandraSession() {
 		return session;
 	}
-
+	public String getAnalyticsCassKeyspace() {
+		return configSettingsLoader.getAnalyticsCassKeyspace();
+	}
 	private static class AnalyticsUsageCassandraClusterClientHolder {
 		public static final AnalyticsUsageCassandraClusterClient INSTANCE = new AnalyticsUsageCassandraClusterClient();
 	}

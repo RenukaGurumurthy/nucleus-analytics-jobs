@@ -21,6 +21,8 @@ public final class ConnectionProvider {
 
 	private static final ElasticsearchClusterClient elasticsearchClusterClient = ElasticsearchClusterClient.instance();
 
+	private static PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
+
 	public Client getElsClient() {
 		return elasticsearchClusterClient.getElsClient();
 	}
@@ -49,6 +51,10 @@ public final class ConnectionProvider {
 		return configSettingsLoader.getEventCassKeyspace();
 	}
 
+	public void openPSQLConnection(){
+		postgreSQLConnection.intializeConnection();
+	}
+	
 	private static class CassandraClientHolder {
 		public static final ConnectionProvider INSTANCE = new ConnectionProvider();
 	}

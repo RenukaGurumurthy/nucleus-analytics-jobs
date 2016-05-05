@@ -39,7 +39,7 @@ public class StatDataMigration {
 	private static final String COUNT_COPY = "count~copy";
 	private static final String TOTAL_TIMESPENT_IN_MS = "totalTimeSpentInMs";
 	private static final String COPY = "copy";
-	private static final String COUNT_RESOURCE_USED_USER_PUBLIC = "count~resourceUsedUserPublic";
+	private static final String COUNT_RESOURCE_ADDED_PUBLIC = "count~resourceAddedPublic";
 	private static final String ID = "id";
 	private static final String VIEWS_COUNT = "viewsCount";
 	private static final String COLLECTION_REMIX_COUNT = "collectionRemixCount";
@@ -85,20 +85,22 @@ public class StatDataMigration {
 								switch (statMetrics.getName()) {
 								case COUNT_VIEWS:
 									viewCount = statMetrics.getLongValue();
-									updateStatisticalCounterData(gooruOid,VIEWS, viewCount);
-									//balanceCounterData(gooruOid, VIEWS, viewCount);
+									//updateStatisticalCounterData(gooruOid,VIEWS, viewCount);
+									balanceCounterData(gooruOid, VIEWS, viewCount);
 									break;
 								case TIME_SPENT_TOTAL:
-									updateStatisticalCounterData(gooruOid,TOTAL_TIMESPENT_IN_MS,statMetrics.getLongValue());
-									//balanceCounterData(gooruOid, TOTAL_TIMESPENT_IN_MS, statMetrics.getLongValue());
+									//updateStatisticalCounterData(gooruOid,TOTAL_TIMESPENT_IN_MS,statMetrics.getLongValue());
+									balanceCounterData(gooruOid, TOTAL_TIMESPENT_IN_MS, statMetrics.getLongValue());
 									break;
 								case COUNT_COPY:
 									remixCount = statMetrics.getLongValue();
-									updateStatisticalCounterData(gooruOid,COPY, remixCount);
-									//balanceCounterData(gooruOid, COPY, remixCount);
+									//updateStatisticalCounterData(gooruOid,COPY, remixCount);
+									balanceCounterData(gooruOid, COPY, remixCount);
 									break;
-								case COUNT_RESOURCE_USED_USER_PUBLIC:
+								case COUNT_RESOURCE_ADDED_PUBLIC:
 									usedInCollectionCount = statMetrics.getLongValue();
+									//updateStatisticalCounterData(gooruOid,COPY, remixCount);
+									balanceCounterData(gooruOid, USED_IN_COLLECTION_COUNT, usedInCollectionCount);
 									break;
 								default:
 									LOG.info("Unused metric: " + statMetrics.getName());
@@ -189,8 +191,16 @@ public class StatDataMigration {
 					.executeAsync(selectBoundStatement);
 			ResultSet result = resultFuture.get();
 
+			long existingValue = 0;
+			if (result != null) {
+				for (Row resultRow : result) {
+					existingValue = resultRow.getLong(METRICS);
+				}
+			}
+			long balancedMatrics = ((Number) metricsValue).longValue() - existingValue;
+			
 			BoundStatement boundStatement = new BoundStatement(UPDATE_STATISTICAL_COUNTER_DATA);
-			boundStatement.bind((metricsValue - result.one().getLong(METRICS)), clusteringKey, metricsName);
+			boundStatement.bind(balancedMatrics, clusteringKey, metricsName);
 			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
 		} catch (Exception e) {
 			LOG.error("Error while balance stat metrics..", e);

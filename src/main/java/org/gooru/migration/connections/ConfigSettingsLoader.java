@@ -27,16 +27,20 @@ public final class ConfigSettingsLoader {
 	private static String archivedCassCluster = null;
 
 	private static String kafkaBrokers = null;
-	
+
 	private static int statMigrationQueueLimit = 0;
 	private static long statMigrationInterval = 0L;
 	private static int statPublisherQueueLimit = 0;
 	private static long statPublisherInterval = 0L;
 	private static String statPublisherTopic = null;
-	
+
 	private static String elsCluster = null;
 	private static String elsHost = null;
-	
+
+	private static String plSqlUrl = null;
+	private static String plSqlUserName = null;
+	private static String plSqlPassword = null;
+
 	ConfigSettingsLoader() {
 		loadConfigSettings();
 
@@ -54,17 +58,22 @@ public final class ConfigSettingsLoader {
 		eventCassDatacenter = configConstants.getProperty("event.cassandra.datacenter", "datacenter1");
 		eventCassCluster = configConstants.getProperty("event.cassandra.cluster", "cassandra");
 		eventCassKeyspace = configConstants.getProperty("event.cassandra.keyspace", "event_logger_insights");
-		
+
 		kafkaBrokers = configConstants.getProperty("kafka.brokers", "127.0.0.1:9092");
-		
+
 		statMigrationQueueLimit = Integer.parseInt((String) configConstants.get("stat.migration.queue.limit"));
 		statMigrationInterval = Long.parseLong((String) configConstants.get("stat.migration.delay"));
 		statPublisherQueueLimit = Integer.parseInt((String) configConstants.get("stat.publisher.queue.limit"));
-		statPublisherInterval = Long.parseLong((String)configConstants.get("stat.publisher.delay"));
+		statPublisherInterval = Long.parseLong((String) configConstants.get("stat.publisher.delay"));
 		statPublisherTopic = (String) configConstants.get("metrics.publisher.topic");
-		
+
 		elsCluster = (String) configConstants.get("elasticsearch.cluster");
 		elsHost = (String) configConstants.get("elasticsearch.ip");
+
+		plSqlUrl = (String) configConstants.get("postgresql.driverurl");
+		plSqlUserName = (String) configConstants.get("postgresql.username");
+		plSqlPassword = (String) configConstants.get("postgresql.password");
+
 	}
 
 	private static class ConfigSettingsHolder {
@@ -84,7 +93,7 @@ public final class ConfigSettingsLoader {
 			configConstants.load(inputStream);
 			inputStream.close();
 		} catch (Exception e) {
-			LOG.error("Error while loading config properties." , e);
+			LOG.error("Error while loading config properties.", e);
 		}
 	}
 
@@ -159,13 +168,28 @@ public final class ConfigSettingsLoader {
 	public long getStatPublisherInterval() {
 		return statPublisherInterval;
 	}
+
 	public String getStatPublisherTopic() {
 		return statPublisherTopic;
 	}
+
 	public String getElsCluster() {
 		return elsCluster;
 	}
+
 	public String getElsHost() {
 		return elsHost;
+	}
+
+	public String getPlSqlUrl() {
+		return plSqlUrl;
+	}
+
+	public String getPlSqlUserName() {
+		return plSqlUserName;
+	}
+
+	public String getPlSqlPassword() {
+		return plSqlPassword;
 	}
 }
