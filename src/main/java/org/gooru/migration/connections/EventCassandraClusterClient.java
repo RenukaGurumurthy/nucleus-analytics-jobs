@@ -5,10 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.DefaultRetryPolicy;
 import com.datastax.driver.core.policies.ExponentialReconnectionPolicy;
-import com.datastax.driver.core.policies.TokenAwarePolicy;
 
 public final class EventCassandraClusterClient {
 
@@ -33,6 +31,10 @@ public final class EventCassandraClusterClient {
 		return session;
 	}
 
+	public String getAnalyticsCassKeyspace() {
+		return configSettingsLoader.getEventCassKeyspace();
+	}
+	
 	private static class EventCassandraClusterClientHolder {
 		public static final EventCassandraClusterClient INSTANCE = new EventCassandraClusterClient();
 	}

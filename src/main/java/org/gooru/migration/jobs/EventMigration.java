@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.gooru.migration.connections.ConnectionProvider;
+import org.gooru.migration.constants.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +18,6 @@ public class EventMigration {
 	private static final Logger LOG = LoggerFactory.getLogger(EventMigration.class);
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
-	private static String EVENT_TIMIELINE = "event_timeline";
-	private static String EVENT_DETAIL = "event_detail";
 	private static PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
 			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
 	private static PreparedStatement insertEventTimeLine = (connectionProvider.getAnalyticsCassandraSession())
@@ -41,13 +40,13 @@ public class EventMigration {
 				String currentDate = minuteDateFormatter.format(new Date(startDate));
 				LOG.info("Running for :" + currentDate);
 				// Incrementing time - one minute
-				ColumnList<String> et = readWithKey(EVENT_TIMIELINE, currentDate);
+				ColumnList<String> et = readWithKey(Constants.EVENT_TIMIELINE, currentDate);
 				for (String eventId : et.getColumnNames()) {
-					ColumnList<String> ef = readWithKey(EVENT_DETAIL, et.getStringValue(eventId, "NA"));
+					ColumnList<String> ef = readWithKey(Constants.EVENT_DETAIL, et.getStringValue(eventId, Constants.NA));
 					// Insert event_time_line
-					insertData(currentDate, et.getStringValue(eventId, "NA"), insertEventTimeLine);
+					insertData(currentDate, et.getStringValue(eventId, Constants.NA), insertEventTimeLine);
 					// Insert events
-					insertData(et.getStringValue(eventId, "NA"), ef.getStringValue("fields", "NA"), insertEvents);
+					insertData(et.getStringValue(eventId, Constants.NA), ef.getStringValue(Constants.FIELDS, Constants.NA), insertEvents);
 				}
 				startDate = new Date(startDate).getTime() + 60000;
 				Thread.sleep(200);

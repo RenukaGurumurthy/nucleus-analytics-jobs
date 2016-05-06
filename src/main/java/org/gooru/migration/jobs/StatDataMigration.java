@@ -7,8 +7,10 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.gooru.migration.connections.ConnectionProvider;
+import org.gooru.migration.constants.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,36 +30,15 @@ public class StatDataMigration {
 	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatMigrationQueueLimit();
-	private static final String STAT_PUBLISHER_QUEUE = "stat_publisher_queue";
-	private static final String METRICS = "metrics";
-	private static final String VIEWS = "views";
-	private static final String _METRICS_NAME = "metrics_name";
-	private static final String _GOORU_OID = "gooru_oid";
-	private static final String MIGRATE_METRICS = "migrateMetrics";
-	private static final String COUNT_VIEWS = "count~views";
-	private static final String TIME_SPENT_TOTAL = "time_spent~total";
-	private static final String COUNT_COPY = "count~copy";
-	private static final String TOTAL_TIMESPENT_IN_MS = "totalTimeSpentInMs";
-	private static final String COPY = "copy";
-	private static final String COUNT_RESOURCE_ADDED_PUBLIC = "count~resourceAddedPublic";
-	private static final String ID = "id";
-	private static final String VIEWS_COUNT = "viewsCount";
-	private static final String COLLECTION_REMIX_COUNT = "collectionRemixCount";
-	private static final String USED_IN_COLLECTION_COUNT = "usedInCollectionCount";
-	private static final String COLLABORATOR_COUNT = "collaboratorCount";
-	private static final String indexName = "gooru_local_statistics_v2";
-	private static final String typeName = "statistics";
-	
-	
+	private static final String indexName = connectionProvider.getConfigsettingsloader().getSearchElsIndex();
+	private static final String typeName = connectionProvider.getConfigsettingsloader().getSearchElsType();
 	private static final Timer timer = new Timer();
 	private static final long JOB_DELAY = 0;
 	private static final long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatMigrationInterval();
 	private static XContentBuilder contentBuilder = null;
-
 	private static PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = connectionProvider.getAnalyticsCassandraSession()
 			.prepare(
 					"UPDATE statistical_data SET metrics_value = metrics_value+? WHERE clustering_key = ? AND metrics_name = ?");
-
 	private static PreparedStatement SELECT_STATISTICAL_COUNTER_DATA = connectionProvider.getAnalyticsCassandraSession()
 			.prepare(
 					"SELECT metrics_value AS metrics FROM statistical_data WHERE clustering_key = ? AND metrics_name = ?");
@@ -71,56 +52,66 @@ public class StatDataMigration {
 			@Override
 			public void run() {
 				try {
-					ResultSet queueSet = getPublisherQueue(MIGRATE_METRICS);
+					ResultSet queueSet = getPublisherQueue(Constants.MIGRATE_METRICS);
 					for (Row queue : queueSet) {
-						String gooruOid = queue.getString(_GOORU_OID);
-						ColumnList<String> statMetricsColumns = getStatMetrics(gooruOid);
+						String gooruOid = queue.getString(Constants._GOORU_OID);
+						ColumnList<String> statMetricsColumns = null;
+						if (StringUtils.isNotBlank(gooruOid)) {
+							statMetricsColumns = getStatMetrics(gooruOid);
+						}
 						if (statMetricsColumns != null) {
 							contentBuilder = jsonBuilder().startObject();
 							LOG.info("migrating id : " + gooruOid);
+							long viewCount = 0L;
+							long remixCount = 0L;
+							long usedInCollectionCount = 0L;
 							for (Column<String> statMetrics : statMetricsColumns) {
-								long viewCount = 0L;
-								long remixCount = 0L;
-								long usedInCollectionCount = 0L;
+
 								switch (statMetrics.getName()) {
-								case COUNT_VIEWS:
+								case Constants.COUNT_VIEWS:
 									viewCount = statMetrics.getLongValue();
-									//updateStatisticalCounterData(gooruOid,VIEWS, viewCount);
-									balanceCounterData(gooruOid, VIEWS, viewCount);
+									// updateStatisticalCounterData(gooruOid,VIEWS,
+									// viewCount);
+									balanceCounterData(gooruOid, Constants.VIEWS, viewCount);
 									break;
-								case TIME_SPENT_TOTAL:
-									//updateStatisticalCounterData(gooruOid,TOTAL_TIMESPENT_IN_MS,statMetrics.getLongValue());
-									balanceCounterData(gooruOid, TOTAL_TIMESPENT_IN_MS, statMetrics.getLongValue());
+								case Constants.TIME_SPENT_TOTAL:
+									// updateStatisticalCounterData(gooruOid,TOTAL_TIMESPENT_IN_MS,statMetrics.getLongValue());
+									balanceCounterData(gooruOid, Constants.TOTAL_TIMESPENT_IN_MS, statMetrics.getLongValue());
 									break;
-								case COUNT_COPY:
+								case Constants.COUNT_COPY:
 									remixCount = statMetrics.getLongValue();
-									//updateStatisticalCounterData(gooruOid,COPY, remixCount);
-									balanceCounterData(gooruOid, COPY, remixCount);
+									// updateStatisticalCounterData(gooruOid,COPY,
+									// remixCount);
+									balanceCounterData(gooruOid, Constants.COPY, remixCount);
 									break;
-								case COUNT_RESOURCE_ADDED_PUBLIC:
+								case Constants.COUNT_RESOURCE_ADDED_PUBLIC:
 									usedInCollectionCount = statMetrics.getLongValue();
-									//updateStatisticalCounterData(gooruOid,COPY, remixCount);
-									balanceCounterData(gooruOid, USED_IN_COLLECTION_COUNT, usedInCollectionCount);
+									// updateStatisticalCounterData(gooruOid,COPY,
+									// remixCount);
+									balanceCounterData(gooruOid, Constants.USED_IN_COLLECTION_COUNT, usedInCollectionCount);
 									break;
 								default:
 									LOG.info("Unused metric: " + statMetrics.getName());
 								}
-								/**
-								 * Generate content builder to write in search
-								 * index.
-								 */
-								contentBuilder.field(ID, gooruOid);
-								contentBuilder.field(VIEWS_COUNT, viewCount);
-								contentBuilder.field(COLLECTION_REMIX_COUNT, remixCount);
-								contentBuilder.field(USED_IN_COLLECTION_COUNT, usedInCollectionCount);
-								contentBuilder.field(COLLABORATOR_COUNT, 0);
+
 							}
-							indexingES(indexName, typeName, gooruOid, contentBuilder);
+							/**
+							 * Generate content builder to write in search
+							 * index.
+							 */
+							if (StringUtils.isNotBlank(gooruOid)) {
+								contentBuilder.field(Constants.ID, gooruOid);
+								contentBuilder.field(Constants.VIEWS_COUNT, viewCount);
+								contentBuilder.field(Constants.COLLECTION_REMIX_COUNT, remixCount);
+								contentBuilder.field(Constants.USED_IN_COLLECTION_COUNT, usedInCollectionCount);
+								contentBuilder.field(Constants.COLLABORATOR_COUNT, 0);
+								indexingES(indexName, typeName, gooruOid, contentBuilder);
+							}
 						}
-						deleteFromPublisherQueue(MIGRATE_METRICS, gooruOid);
+						deleteFromPublisherQueue(Constants.MIGRATE_METRICS, gooruOid);
 					}
 				} catch (IOException e) {
-					LOG.error("Error while migrating data : {}", e);
+					LOG.error("Error while migrating data.", e);
 				}
 				LOG.info("Job running at {}", new Date());
 			}
@@ -132,8 +123,8 @@ public class StatDataMigration {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
-					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
+					.from(connectionProvider.getEventCassandraName(), Constants.STAT_PUBLISHER_QUEUE)
+					.where(QueryBuilder.eq(Constants._METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession()).executeAsync(select);
 			result = resultSetFuture.get();
@@ -147,8 +138,8 @@ public class StatDataMigration {
 		try {
 			LOG.info("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
-					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
-					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
+					.from(connectionProvider.getEventCassandraName(), Constants.STAT_PUBLISHER_QUEUE)
+					.where(QueryBuilder.eq(Constants._METRICS_NAME, metricsName)).and(QueryBuilder.eq(Constants._GOORU_OID, gooruOid))
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession()).executeAsync(select);
 			resultSetFuture.get();
@@ -194,11 +185,11 @@ public class StatDataMigration {
 			long existingValue = 0;
 			if (result != null) {
 				for (Row resultRow : result) {
-					existingValue = resultRow.getLong(METRICS);
+					existingValue = resultRow.getLong(Constants.METRICS);
 				}
 			}
 			long balancedMatrics = ((Number) metricsValue).longValue() - existingValue;
-			
+
 			BoundStatement boundStatement = new BoundStatement(UPDATE_STATISTICAL_COUNTER_DATA);
 			boundStatement.bind(balancedMatrics, clusteringKey, metricsName);
 			connectionProvider.getAnalyticsCassandraSession().executeAsync(boundStatement);
@@ -210,7 +201,7 @@ public class StatDataMigration {
 	}
 
 	private static void indexingES(String indexName, String indexType, String id, XContentBuilder contentBuilder) {
-		connectionProvider.getElsClient().prepareIndex(indexName, indexType, id).setSource(contentBuilder).execute()
-				.actionGet();
+		connectionProvider.getSearchElsClient().prepareIndex(indexName, indexType, id).setSource(contentBuilder)
+				.execute().actionGet();
 	}
 }

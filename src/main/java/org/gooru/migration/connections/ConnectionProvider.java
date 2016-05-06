@@ -23,7 +23,7 @@ public final class ConnectionProvider {
 
 	private static PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
 
-	public Client getElsClient() {
+	public Client getSearchElsClient() {
 		return elasticsearchClusterClient.getElsClient();
 	}
 

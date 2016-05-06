@@ -34,8 +34,10 @@ public final class ConfigSettingsLoader {
 	private static long statPublisherInterval = 0L;
 	private static String statPublisherTopic = null;
 
-	private static String elsCluster = null;
-	private static String elsHost = null;
+	private static String searchElsCluster = null;
+	private static String searchElsHost = null;
+	private static String searchIndexName = null;
+	private static String searchTypeName = null;
 
 	private static String plSqlUrl = null;
 	private static String plSqlUserName = null;
@@ -67,8 +69,10 @@ public final class ConfigSettingsLoader {
 		statPublisherInterval = Long.parseLong((String) configConstants.get("stat.publisher.delay"));
 		statPublisherTopic = (String) configConstants.get("metrics.publisher.topic");
 
-		elsCluster = (String) configConstants.get("elasticsearch.cluster");
-		elsHost = (String) configConstants.get("elasticsearch.ip");
+		searchElsCluster = (String) configConstants.get("search.elasticsearch.cluster");
+		searchElsHost = (String) configConstants.get("search.elasticsearch.ip");
+		searchIndexName = (String) configConstants.get("search.elasticsearch.index");
+		searchTypeName = (String) configConstants.get("search.elasticsearch.type");
 
 		plSqlUrl = (String) configConstants.get("postgresql.driverurl");
 		plSqlUserName = (String) configConstants.get("postgresql.username");
@@ -173,14 +177,20 @@ public final class ConfigSettingsLoader {
 		return statPublisherTopic;
 	}
 
-	public String getElsCluster() {
-		return elsCluster;
+	public String getSearchElsCluster() {
+		return searchElsCluster;
 	}
 
-	public String getElsHost() {
-		return elsHost;
+	public String getSearchElsHost() {
+		return searchElsHost;
 	}
 
+	public String getSearchElsIndex() {
+		return searchIndexName;
+	}
+	public String getSearchElsType() {
+		return searchTypeName;
+	}
 	public String getPlSqlUrl() {
 		return plSqlUrl;
 	}

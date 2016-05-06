@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.gooru.migration.connections.ConnectionProvider;
+import org.gooru.migration.constants.Constants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -22,23 +23,8 @@ import kafka.producer.KeyedMessage;
 public class StatMetricsPublisher {
 	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
-	private static final String STATISTICAL_DATA = "statistical_data";
-	private static final String STAT_PUBLISHER_QUEUE = "stat_publisher_queue";
 	private static final String KAFKA_QUEUE_TOPIC = connectionProvider.getMetricsPublisherQueueTopic();
-	private static final String _CLUSTERING_KEY = "clustering_key";
-	private static final String _METRICS_NAME = "metrics_name";
-	private static final String _METRICS_VALUE = "metrics_value";
-	private static final String TYPE = "type";
-	private static final String ID = "id";
-	private static final String VIEWS = "views";
-	private static final String VIEWS_COUNT = "viewsCount";
-	private static final String DATA = "data";
-	private static final String EVENT_NAME = "eventName";
-	private static final String VIEWS_UPDATE = "views.update";
-	private static final String _GOORU_OID = "gooru_oid";
-	private static final String PUBLISH_METRICS = "publishMetrics";
 	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatPublisherQueueLimit();
-
 	private static Timer timer = new Timer();
 	private static long JOB_DELAY = 0;
 	private static long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatPublisherInterval();
@@ -47,22 +33,22 @@ public class StatMetricsPublisher {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				ResultSet queueSet = getPublisherQueue(PUBLISH_METRICS);
+				ResultSet queueSet = getPublisherQueue(Constants.PUBLISH_METRICS);
 				JSONObject statObject = new JSONObject();
 				JSONArray jArray = new JSONArray();
 				for (Row queue : queueSet) {
-					ResultSet resultSet = getStatMetrics(queue.getString(_GOORU_OID),VIEWS);
+					ResultSet resultSet = getStatMetrics(queue.getString(Constants._GOORU_OID),Constants.VIEWS);
 					for (Row result : resultSet) {
 						JSONObject jObject = new JSONObject();
-						jObject.put(ID, result.getString(_CLUSTERING_KEY));
-						jObject.put(VIEWS_COUNT, result.getLong(_METRICS_VALUE));
-						jObject.put(TYPE, queue.getString(TYPE));
+						jObject.put(Constants.ID, result.getString(Constants._CLUSTERING_KEY));
+						jObject.put(Constants.VIEWS_COUNT, result.getLong(Constants._METRICS_VALUE));
+						jObject.put(Constants.TYPE, queue.getString(Constants.TYPE));
 						jArray.add(jObject);
 					}
-					 deleteFromPublisherQueue(PUBLISH_METRICS,queue.getString(_GOORU_OID));
+					 deleteFromPublisherQueue(Constants.PUBLISH_METRICS,queue.getString(Constants._GOORU_OID));
 				}
-				statObject.put(EVENT_NAME, VIEWS_UPDATE);
-				statObject.put(DATA, jArray);
+				statObject.put(Constants.EVENT_NAME, Constants.VIEWS_UPDATE);
+				statObject.put(Constants.DATA, jArray);
 				
 				if (!jArray.isEmpty()) {
 					LOG.info("message : " + statObject.toString());
@@ -81,8 +67,8 @@ public class StatMetricsPublisher {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(connectionProvider.getAnalyticsCassandraName(), STATISTICAL_DATA)
-					.where(QueryBuilder.eq(_CLUSTERING_KEY, gooruOids)).and(QueryBuilder.eq(_METRICS_NAME, metricsName)).setConsistencyLevel(ConsistencyLevel.QUORUM);
+					.from(connectionProvider.getAnalyticsCassandraName(), Constants.STATISTICAL_DATA)
+					.where(QueryBuilder.eq(Constants._CLUSTERING_KEY, gooruOids)).and(QueryBuilder.eq(Constants._METRICS_NAME, metricsName)).setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getAnalyticsCassandraSession())
 					.executeAsync(select);
 			result = resultSetFuture.get();
@@ -96,8 +82,8 @@ public class StatMetricsPublisher {
 		ResultSet result = null;
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
-					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
+					.from(connectionProvider.getEventCassandraName(), Constants.STAT_PUBLISHER_QUEUE)
+					.where(QueryBuilder.eq(Constants._METRICS_NAME, metricsName)).limit(QUEUE_LIMIT)
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession())
 					.executeAsync(select);
@@ -112,8 +98,8 @@ public class StatMetricsPublisher {
 		try {
 			LOG.info("Removing -" + gooruOid + "- from the statistical queue");
 			Statement select = QueryBuilder.delete().all()
-					.from(connectionProvider.getEventCassandraName(), STAT_PUBLISHER_QUEUE)
-					.where(QueryBuilder.eq(_METRICS_NAME, metricsName)).and(QueryBuilder.eq(_GOORU_OID, gooruOid))
+					.from(connectionProvider.getEventCassandraName(), Constants.STAT_PUBLISHER_QUEUE)
+					.where(QueryBuilder.eq(Constants._METRICS_NAME, metricsName)).and(QueryBuilder.eq(Constants._GOORU_OID, gooruOid))
 					.setConsistencyLevel(ConsistencyLevel.QUORUM);
 			ResultSetFuture resultSetFuture = (connectionProvider.getEventCassandraSession())
 					.executeAsync(select);

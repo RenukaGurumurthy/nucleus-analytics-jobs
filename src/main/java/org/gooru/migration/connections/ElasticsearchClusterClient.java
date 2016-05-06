@@ -18,8 +18,8 @@ public class ElasticsearchClusterClient {
 
 	ElasticsearchClusterClient() {
 		try {
-			initializeElsConnection(configSettingsLoader.getElsCluster(),
-					configSettingsLoader.getElsHost());
+			initializeElsConnection(configSettingsLoader.getSearchElsCluster(),
+					configSettingsLoader.getSearchElsHost());
 			LOG.info("ELS Cluster initialized successfully..");
 		} catch (Exception e) {
 			LOG.error("Error while initializing els cluster...");

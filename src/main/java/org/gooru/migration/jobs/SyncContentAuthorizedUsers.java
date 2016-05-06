@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import org.gooru.migration.connections.AnalyticsUsageCassandraClusterClient;
 import org.gooru.migration.connections.PostgreSQLConnection;
+import org.gooru.migration.constants.Constants;
 import org.javalite.activejdbc.Base;
 import org.json.JSONArray;
 import org.slf4j.Logger;
@@ -30,24 +31,11 @@ public class SyncContentAuthorizedUsers {
 			.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncContentAuthorizedUsers.class);
 	private static final String GET_AUTHORIZED_USERS_QUERY = "select id,creator_id,collaborator,updated_at from class where class.updated_at > to_timestamp(?,'YYYY-MM-DD HH:MI:SS') - interval '3 minutes';";
-	private static String ID = "id";
-	private static String CREATOR_ID = "creator_id";
-	private static String CREATOR_UID = "creator_uid";
-	private static String GOORU_OID = "gooru_oid";
-	private static String COLLABORATOR = "collaborator";
-	private static String COLLABORATORS = "collaborators";
 	private static String currentTime = null;
-	private static String UPDATED_AT = "updated_at";
-	private static String SYNC_JOBS_PROPERTIES = "sync_jobs_properties";
-	private static String _JOB_NAME = "job_name";
-	private static String PROPERTY_NAME = "property_name";
-	private static String PROPERTY_VALUE = "property_value";
-	private static String LAST_UPDATED_TIME = "last_updated_time";
-	private static String CONTENT_AUTHORIZED_USERS = "content_authorized_users";
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
 	public static void main(String args[]) {
-		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
 		TimerTask task = new TimerTask() {
 			@Override
@@ -62,10 +50,10 @@ public class SyncContentAuthorizedUsers {
 				String updatedTime = null;
 				List<Map> classList = Base.findAll(GET_AUTHORIZED_USERS_QUERY, currentTime);
 				for (Map classCourseDetail : classList) {
-					String classId = classCourseDetail.get(ID).toString();
-					String creator = classCourseDetail.get(CREATOR_ID).toString();
-					Object collabs = classCourseDetail.get(COLLABORATOR);
-					updatedTime = classCourseDetail.get(UPDATED_AT).toString();
+					String classId = classCourseDetail.get(Constants.ID).toString();
+					String creator = classCourseDetail.get(Constants.CREATOR_ID).toString();
+					Object collabs = classCourseDetail.get(Constants.COLLABORATOR);
+					updatedTime = classCourseDetail.get(Constants.UPDATED_AT).toString();
 					HashSet<String> collaborators = null;
 					LOG.info("class : " + classId);
 					if (collabs != null) {
@@ -88,27 +76,27 @@ public class SyncContentAuthorizedUsers {
 		try {
 			Insert insert = QueryBuilder
 					.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(),
-							CONTENT_AUTHORIZED_USERS)
-					.value(GOORU_OID, classId).value(COLLABORATORS, collabs).value(CREATOR_UID, creator);
+							Constants.CONTENT_AUTHORIZED_USERS)
+					.value(Constants._GOORU_OID, classId).value(Constants.COLLABORATORS, collabs).value(Constants.CREATOR_UID, creator);
 
 			ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession()
 					.executeAsync(insert);
 			resultSetFuture.get();
 		} catch (Exception e) {
-			LOG.error("Error while updating authorized user details.{}", e);
+			LOG.error("Error while updating authorized user details.", e);
 		}
 	}
 
 	private static String getLastUpdatedTime() {
 		try {
 			Statement select = QueryBuilder.select().all()
-					.from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), SYNC_JOBS_PROPERTIES)
-					.where(QueryBuilder.eq(_JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(PROPERTY_NAME, LAST_UPDATED_TIME));
+					.from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
+					.where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME));
 			ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession()
 					.executeAsync(select);
 			ResultSet result = resultSetFuture.get();
 			for (Row r : result) {
-				return r.getString(PROPERTY_VALUE);
+				return r.getString(Constants.PROPERTY_VALUE);
 			}
 		} catch (Exception e) {
 			LOG.error("Error while reading job last updated time.{}", e);
@@ -119,15 +107,15 @@ public class SyncContentAuthorizedUsers {
 	private static void updateLastUpdatedTime(String jobName, String updatedTime) {
 		try {
 			Insert insertStatmt = QueryBuilder
-					.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), SYNC_JOBS_PROPERTIES)
-					.value(_JOB_NAME, jobName).value(PROPERTY_NAME, LAST_UPDATED_TIME)
-					.value(PROPERTY_VALUE, updatedTime);
+					.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
+					.value(Constants._JOB_NAME, jobName).value(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME)
+					.value(Constants.PROPERTY_VALUE, updatedTime);
 
 			ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession()
 					.executeAsync(insertStatmt);
 			resultSetFuture.get();
 		} catch (Exception e) {
-			LOG.error("Error while updating last updated time.{}", e);
+			LOG.error("Error while updating last updated time.", e);
 		}
 	}
 }
