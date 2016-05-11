@@ -11,7 +11,7 @@ public class SampleProducer {
 		// set up the producer
 		KafkaProducer<String, String> producer;
 		Properties props = new Properties();
-		props.put("bootstrap.servers", "54.183.121.104:9092");
+		props.put("bootstrap.servers", "localhost:9092");
 		props.put("acks", "all");
 		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
