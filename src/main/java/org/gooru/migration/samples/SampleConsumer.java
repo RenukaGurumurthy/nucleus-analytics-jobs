@@ -1,4 +1,4 @@
-package org.gooru.migration.jobs;
+package org.gooru.migration.samples;
 
 import java.util.Arrays;
 import java.util.Iterator;

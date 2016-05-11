@@ -1,4 +1,4 @@
-package org.gooru.migration.jobs;
+package org.gooru.migration.samples;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

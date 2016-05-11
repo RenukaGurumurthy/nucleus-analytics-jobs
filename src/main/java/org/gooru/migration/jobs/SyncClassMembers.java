@@ -13,7 +13,6 @@ import org.gooru.migration.connections.AnalyticsUsageCassandraClusterClient;
 import org.gooru.migration.connections.PostgreSQLConnection;
 import org.gooru.migration.constants.Constants;
 import org.javalite.activejdbc.Base;
-import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +23,13 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 
-public class SyncContentAuthorizedUsers {
+public class SyncClassMembers {
 	private static final Timer timer = new Timer();
-	private static final String JOB_NAME = "sync_content_authorized_users";
+	private static final String JOB_NAME = "sync_class_members";
 	private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient
 			.instance();
-	private static final Logger LOG = LoggerFactory.getLogger(SyncContentAuthorizedUsers.class);
-	private static final String GET_AUTHORIZED_USERS_QUERY = "select id,creator_id,collaborator,updated_at from class where class.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
+	private static final Logger LOG = LoggerFactory.getLogger(SyncClassMembers.class);
+	private static final String GET_MEMBERS_QUERY = "select class_id,array_agg(user_id) as members ,now() as updated_at from class_member where class_member_status = 'joined' and updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes' group by class_id;";
 	private static String currentTime = null;
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -48,42 +47,40 @@ public class SyncContentAuthorizedUsers {
 				}
 				LOG.info("currentTime:" + currentTime);
 				String updatedTime = null;
-				List<Map> classList = Base.findAll(GET_AUTHORIZED_USERS_QUERY, currentTime);
-				for (Map classCourseDetail : classList) {
-					String classId = classCourseDetail.get(Constants.ID).toString();
-					String creator = classCourseDetail.get(Constants.CREATOR_ID).toString();
-					Object collabs = classCourseDetail.get(Constants.COLLABORATOR);
-					updatedTime = classCourseDetail.get(Constants.UPDATED_AT).toString();
-					HashSet<String> collaborators = null;
-					LOG.info("class : " + classId);
-					if (collabs != null) {
-						JSONArray collabsArray = new JSONArray(collabs.toString());
-						collaborators = new HashSet<String>();
-						for (int index = 0; index < collabsArray.length(); index++) {
-							collaborators.add(collabsArray.getString(index));
+				List<Map> classList = Base.findAll(GET_MEMBERS_QUERY, currentTime);
+				for (Map membersList : classList) {
+					String classId = membersList.get(Constants.CLASS_ID).toString();
+					String classMembers = membersList.get(Constants.MEMBERS).toString();
+					updatedTime = membersList.get(Constants.UPDATED_AT).toString();
+					LOG.info("classId : " + classId);
+					HashSet<String> members = null;
+					if (classMembers != null) {
+						members = new HashSet<String>();
+						for (String c : (classMembers.replace("}", "").replace("{", "")).split(",")) {
+							members.add(c);
 						}
 					}
-					updateAuthorizedUsers(classId, creator, collaborators);
+					updateClassMembers(classId,members);
 				}
 				updateLastUpdatedTime(JOB_NAME, updatedTime == null ? currentTime : updatedTime);
 				Base.close();
 			}
 		};
-		timer.scheduleAtFixedRate(task, 0, 120000);
+		timer.scheduleAtFixedRate(task, 0, 12000);
 	}
 
-	private static void updateAuthorizedUsers(String classId, String creator, HashSet<String> collabs) {
+	private static void updateClassMembers(String classId, HashSet<String> members) {
 		try {
 			Insert insert = QueryBuilder
 					.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(),
-							Constants.CONTENT_AUTHORIZED_USERS)
-					.value(Constants._GOORU_OID, classId).value(Constants.COLLABORATORS, collabs).value(Constants.CREATOR_UID, creator);
+							Constants.CLASS_MEMBERS)
+					.value(Constants.CLASS_ID, classId).value(Constants.MEMBERS, members);
 
 			ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession()
 					.executeAsync(insert);
 			resultSetFuture.get();
 		} catch (Exception e) {
-			LOG.error("Error while updating authorized user details.", e);
+			LOG.error("Error while updating class members details.", e);
 		}
 	}
 

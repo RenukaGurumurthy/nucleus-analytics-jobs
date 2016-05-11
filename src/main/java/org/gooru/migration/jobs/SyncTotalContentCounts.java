@@ -32,7 +32,7 @@ public class SyncTotalContentCounts {
 			.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncTotalContentCounts.class);
 	private static String currentTime = null;
-	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public static void main(String args[]) {
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
