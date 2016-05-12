@@ -2,15 +2,13 @@ package org.gooru.migration.connections;
 
 import java.util.Properties;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import kafka.javaapi.producer.Producer;
-import kafka.producer.ProducerConfig;
-
 public class KafkaClusterClient {
 
-	private static Producer<String, String> producer = null;
+	private static KafkaProducer<String, String> producer = null;
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(KafkaClusterClient.class);
 	KafkaClusterClient() {
@@ -28,16 +26,19 @@ public class KafkaClusterClient {
 
 	private static void initializeKafkaConnection(String brokers) {
 		Properties props = new Properties();
-		props.put("metadata.broker.list", brokers);
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("retry.backoff.ms", "1000");
-		props.put("request.required.acks", "1");
-		props.put("producer.type", "async");
-		ProducerConfig config = new ProducerConfig(props);
-		producer = new Producer<String, String>(config);
+		props.put("bootstrap.servers", brokers);
+		props.put("acks", "all");
+		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		props.put("retries", 0);
+		props.put("batch.size", 16384);
+		props.put("linger.ms", 0);
+		props.put("block.on.buffer.full", true);
+		props.put("auto.commit.interval.ms", 1000);
+		producer = new KafkaProducer<>(props);
 	}
 
-	public Producer<String, String> getPublisher() {
+	public KafkaProducer<String, String> getPublisher() {
 		return producer;
 	}
 }
