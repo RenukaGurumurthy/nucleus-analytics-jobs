@@ -43,6 +43,10 @@ public final class ConfigSettingsLoader {
 	private static String plSqlUserName = null;
 	private static String plSqlPassword = null;
 
+	private static long syncClassMembersInterval = 0L;
+	private static long syncContentAuthrizersInterval = 0L;
+	private static long syncTotalCountsInterval = 0L;
+	
 	ConfigSettingsLoader() {
 		loadConfigSettings();
 
@@ -78,6 +82,9 @@ public final class ConfigSettingsLoader {
 		plSqlUserName = (String) configConstants.get("postgresql.username");
 		plSqlPassword = (String) configConstants.get("postgresql.password");
 
+		syncClassMembersInterval = Long.parseLong((String) configConstants.get("class.members.sync.delay"));
+		syncContentAuthrizersInterval = Long.parseLong((String) configConstants.get("content.authorizers.sync.delay"));
+		syncTotalCountsInterval = Long.parseLong((String) configConstants.get("total.counts.sync.delay"));
 	}
 
 	private static class ConfigSettingsHolder {
@@ -201,5 +208,14 @@ public final class ConfigSettingsLoader {
 
 	public String getPlSqlPassword() {
 		return plSqlPassword;
+	}
+	public long getClassMembersSyncInterval() {
+		return syncClassMembersInterval;
+	}
+	public long getTotalCountsSyncInterval() {
+		return syncTotalCountsInterval;
+	}
+	public long getContentAuthorizersSyncInterval() {
+		return syncContentAuthrizersInterval;
 	}
 }

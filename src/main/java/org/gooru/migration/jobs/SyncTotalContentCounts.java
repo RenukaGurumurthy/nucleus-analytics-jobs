@@ -11,6 +11,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import org.gooru.migration.connections.AnalyticsUsageCassandraClusterClient;
+import org.gooru.migration.connections.ConfigSettingsLoader;
 import org.gooru.migration.connections.PostgreSQLConnection;
 import org.gooru.migration.constants.Constants;
 import org.javalite.activejdbc.Base;
@@ -28,12 +29,14 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 public class SyncTotalContentCounts {
 	private static final Timer timer = new Timer();
 	private static final String JOB_NAME = "sync_total_content_counts";
+	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 	private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient
 			.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncTotalContentCounts.class);
 	private static String currentTime = null;
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+	private static final long JOB_INTERVAL = configSettingsLoader.getTotalCountsSyncInterval();
+	
 	public static void main(String args[]) {
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
@@ -67,7 +70,7 @@ public class SyncTotalContentCounts {
 				Base.close();
 			}
 		};
-		timer.scheduleAtFixedRate(task, 0, 120000);
+		timer.scheduleAtFixedRate(task, 0, JOB_INTERVAL);
 	}
 
 	private static void updateCounts(String classId, List<Map> collectionCount) {

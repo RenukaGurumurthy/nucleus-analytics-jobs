@@ -10,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.gooru.migration.connections.AnalyticsUsageCassandraClusterClient;
+import org.gooru.migration.connections.ConfigSettingsLoader;
 import org.gooru.migration.connections.PostgreSQLConnection;
 import org.gooru.migration.constants.Constants;
 import org.javalite.activejdbc.Base;
@@ -26,13 +27,15 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 public class SyncClassMembers {
 	private static final Timer timer = new Timer();
 	private static final String JOB_NAME = "sync_class_members";
+	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 	private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient
 			.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncClassMembers.class);
 	private static final String GET_MEMBERS_QUERY = "select class_id,array_agg(user_id) as members ,now() as updated_at from class_member where class_member_status = 'joined' and updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes' group by class_id;";
 	private static String currentTime = null;
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+	private static final long JOB_INTERVAL = configSettingsLoader.getClassMembersSyncInterval();
+	
 	public static void main(String args[]) {
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
@@ -66,7 +69,7 @@ public class SyncClassMembers {
 				Base.close();
 			}
 		};
-		timer.scheduleAtFixedRate(task, 0, 12000);
+		timer.scheduleAtFixedRate(task, 0, JOB_INTERVAL);
 	}
 
 	private static void updateClassMembers(String classId, HashSet<String> members) {

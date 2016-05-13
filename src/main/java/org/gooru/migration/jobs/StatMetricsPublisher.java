@@ -20,8 +20,6 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 
-import kafka.producer.KeyedMessage;
-
 public class StatMetricsPublisher {
 	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
 	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
