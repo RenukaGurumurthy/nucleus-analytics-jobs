@@ -1,4 +1,4 @@
-package org.gooru.migration.connections;
+package org.gooru.analyics.jobs.infra;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;

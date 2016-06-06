@@ -1,4 +1,4 @@
-package org.gooru.migration.utils;
+package org.gooru.analyics.jobs.utils;
 
 import java.util.HashMap;
 import java.util.Map;

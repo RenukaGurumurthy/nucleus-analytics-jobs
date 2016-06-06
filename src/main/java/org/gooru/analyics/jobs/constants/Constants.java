@@ -1,4 +1,4 @@
-package org.gooru.migration.constants;
+package org.gooru.analyics.jobs.constants;
 
 public class Constants {
 	public static final String NA = "NA";

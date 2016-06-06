@@ -1,4 +1,4 @@
-package org.gooru.migration.jobs;
+package org.gooru.analyics.jobs.executor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,10 +9,10 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.gooru.migration.connections.AnalyticsUsageCassandraClusterClient;
-import org.gooru.migration.connections.ConfigSettingsLoader;
-import org.gooru.migration.connections.PostgreSQLConnection;
-import org.gooru.migration.constants.Constants;
+import org.gooru.analyics.jobs.constants.Constants;
+import org.gooru.analyics.jobs.infra.AnalyticsUsageCassandraClusterClient;
+import org.gooru.analyics.jobs.infra.ConfigSettingsLoader;
+import org.gooru.analyics.jobs.infra.PostgreSQLConnection;
 import org.javalite.activejdbc.Base;
 import org.json.JSONArray;
 import org.slf4j.Logger;

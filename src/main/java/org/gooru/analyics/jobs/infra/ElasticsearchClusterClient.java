@@ -1,4 +1,4 @@
-package org.gooru.migration.connections;
+package org.gooru.analyics.jobs.infra;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

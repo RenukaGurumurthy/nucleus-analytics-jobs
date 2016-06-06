@@ -1,4 +1,4 @@
-package org.gooru.migration.samples;
+package org.gooru.analyics.jobs.samples;
 
 import java.io.IOException;
 import java.util.Properties;

@@ -1,4 +1,4 @@
-package org.gooru.migration.jobs;
+package org.gooru.analyics.jobs.executor;
 
 import java.util.Date;
 import java.util.Timer;
@@ -6,8 +6,8 @@ import java.util.TimerTask;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.gooru.migration.connections.ConnectionProvider;
-import org.gooru.migration.constants.Constants;
+import org.gooru.analyics.jobs.constants.Constants;
+import org.gooru.analyics.jobs.infra.ConnectionProvider;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

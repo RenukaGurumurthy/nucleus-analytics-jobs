@@ -1,4 +1,4 @@
-package org.gooru.migration.connections;
+package org.gooru.analyics.jobs.infra;
 
 import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;

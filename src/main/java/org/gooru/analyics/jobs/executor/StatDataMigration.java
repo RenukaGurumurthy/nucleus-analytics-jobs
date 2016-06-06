@@ -1,4 +1,4 @@
-package org.gooru.migration.jobs;
+package org.gooru.analyics.jobs.executor;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -9,8 +9,8 @@ import java.util.TimerTask;
 
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.gooru.migration.connections.ConnectionProvider;
-import org.gooru.migration.constants.Constants;
+import org.gooru.analyics.jobs.constants.Constants;
+import org.gooru.analyics.jobs.infra.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

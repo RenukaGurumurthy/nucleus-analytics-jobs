@@ -16,4 +16,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'migration-scripts'
+rootProject.name = 'nucleus-analytics-jobs'

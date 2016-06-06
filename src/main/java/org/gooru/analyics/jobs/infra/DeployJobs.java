@@ -1,15 +1,15 @@
-package org.gooru.migration.connections;
+package org.gooru.analyics.jobs.infra;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import org.gooru.migration.jobs.StatDataMigration;
-import org.gooru.migration.jobs.StatMetricsPublisher;
-import org.gooru.migration.jobs.SyncClassMembers;
-import org.gooru.migration.jobs.SyncContentAuthorizedUsers;
-import org.gooru.migration.jobs.SyncTotalContentCounts;
-import org.gooru.migration.utils.Args;
+import org.gooru.analyics.jobs.executor.StatDataMigration;
+import org.gooru.analyics.jobs.executor.StatMetricsPublisher;
+import org.gooru.analyics.jobs.executor.SyncClassMembers;
+import org.gooru.analyics.jobs.executor.SyncContentAuthorizedUsers;
+import org.gooru.analyics.jobs.executor.SyncTotalContentCounts;
+import org.gooru.analyics.jobs.utils.Args;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

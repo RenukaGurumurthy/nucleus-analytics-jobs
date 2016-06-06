@@ -1,10 +1,10 @@
-package org.gooru.migration.jobs;
+package org.gooru.analyics.jobs.executor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.gooru.migration.connections.ConnectionProvider;
-import org.gooru.migration.constants.Constants;
+import org.gooru.analyics.jobs.constants.Constants;
+import org.gooru.analyics.jobs.infra.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
