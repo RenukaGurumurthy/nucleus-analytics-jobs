@@ -21,9 +21,7 @@ public class PostgreSQLConnection {
 
 	public void intializeConnection() {
 		try {
-			System.out.println("intializingConnection.....");
 			if (!Base.hasConnection()) {
-				System.out.println("No connection already....");
 				Base.open("org.postgresql.Driver", configSettingsLoader.getPlSqlUrl(),
 						configSettingsLoader.getPlSqlUserName(), configSettingsLoader.getPlSqlPassword());
 			}

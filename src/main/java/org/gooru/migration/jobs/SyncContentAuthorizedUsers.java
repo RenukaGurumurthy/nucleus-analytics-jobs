@@ -37,7 +37,8 @@ public class SyncContentAuthorizedUsers {
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getTotalCountsSyncInterval();
 	
-	public static void main(String args[]) {
+	public SyncContentAuthorizedUsers()  {
+		LOG.info("deploying SyncContentAuthorizedUsers....");
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
 		TimerTask task = new TimerTask() {

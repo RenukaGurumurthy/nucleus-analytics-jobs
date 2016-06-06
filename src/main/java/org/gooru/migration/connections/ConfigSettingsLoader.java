@@ -1,15 +1,10 @@
 package org.gooru.migration.connections;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class ConfigSettingsLoader {
-	private static Properties configConstants = new Properties();
 	private static final Logger LOG = LoggerFactory.getLogger(ConfigSettingsLoader.class);
 	private static String analyticsCassKeyspace = null;
 	private static String analyticsCassSeeds = null;
@@ -47,44 +42,47 @@ public final class ConfigSettingsLoader {
 	private static long syncContentAuthrizersInterval = 0L;
 	private static long syncTotalCountsInterval = 0L;
 	
+	ConfigSettingsLoader(JSONObject config) {
+
+		analyticsCassSeeds = config.getString("analytics.cassandra.seeds");
+		analyticsCassDatacenter = config.getString("analytics.cassandra.datacenter");
+		analyticsCassCluster = config.getString("analytics.cassandra.cluster");
+		analyticsCassKeyspace = config.getString("analytics.cassandra.keyspace");
+
+		archivedCassSeeds = config.getString("archived.cassandra.seeds");
+		archivedCassDatacenter = config.getString("archived.cassandra.datacenter");
+		archivedCassCluster = config.getString("archived.cassandra.cluster");
+		archivedCassKeyspace = config.getString("archived.cassandra.keyspace");
+
+		eventCassSeeds = config.getString("event.cassandra.seeds");
+		eventCassDatacenter = config.getString("event.cassandra.datacenter");
+		eventCassCluster = config.getString("event.cassandra.cluster");
+		eventCassKeyspace = config.getString("event.cassandra.keyspace");
+
+		kafkaBrokers = config.getString("kafka.brokers");
+
+		statMigrationQueueLimit = config.getInt("stat.migration.queue.limit");
+		statMigrationInterval = config.getLong("stat.migration.delay");
+		statPublisherQueueLimit = config.getInt("stat.publisher.queue.limit");
+		statPublisherInterval = config.getInt("stat.publisher.delay");
+		statPublisherTopic = config.getString("metrics.publisher.topic");
+
+		searchElsCluster = config.getString("search.elasticsearch.cluster");
+		searchElsHost = config.getString("search.elasticsearch.ip");
+		searchIndexName = config.getString("search.elasticsearch.index");
+		searchTypeName = config.getString("search.elasticsearch.type");
+
+		plSqlUrl = config.getString("postgresql.driverurl");
+		plSqlUserName = config.getString("postgresql.username");
+		plSqlPassword = config.getString("postgresql.password");
+
+		syncClassMembersInterval = config.getLong("class.members.sync.delay");
+		syncContentAuthrizersInterval = config.getLong("content.authorizers.sync.delay");
+		syncTotalCountsInterval =config.getLong("total.counts.sync.delay");
+		
+	}
 	ConfigSettingsLoader() {
-		loadConfigSettings();
-
-		analyticsCassSeeds = configConstants.getProperty("analytics.cassandra.seeds", "127.0.0.1");
-		analyticsCassDatacenter = configConstants.getProperty("analytics.cassandra.datacenter", "datacenter1");
-		analyticsCassCluster = configConstants.getProperty("analytics.cassandra.cluster", "cassandra");
-		analyticsCassKeyspace = configConstants.getProperty("analytics.cassandra.keyspace", "event_logger_insights");
-
-		archivedCassSeeds = configConstants.getProperty("archived.cassandra.seeds", "127.0.0.1");
-		archivedCassDatacenter = configConstants.getProperty("archived.cassandra.datacenter", "datacenter1");
-		archivedCassCluster = configConstants.getProperty("archived.cassandra.cluster", "cassandra");
-		archivedCassKeyspace = configConstants.getProperty("archived.cassandra.keyspace", "event_logger_insights");
-
-		eventCassSeeds = configConstants.getProperty("event.cassandra.seeds", "127.0.0.1");
-		eventCassDatacenter = configConstants.getProperty("event.cassandra.datacenter", "datacenter1");
-		eventCassCluster = configConstants.getProperty("event.cassandra.cluster", "cassandra");
-		eventCassKeyspace = configConstants.getProperty("event.cassandra.keyspace", "event_logger_insights");
-
-		kafkaBrokers = configConstants.getProperty("kafka.brokers", "127.0.0.1:9092");
-
-		statMigrationQueueLimit = Integer.parseInt((String) configConstants.get("stat.migration.queue.limit"));
-		statMigrationInterval = Long.parseLong((String) configConstants.get("stat.migration.delay"));
-		statPublisherQueueLimit = Integer.parseInt((String) configConstants.get("stat.publisher.queue.limit"));
-		statPublisherInterval = Long.parseLong((String) configConstants.get("stat.publisher.delay"));
-		statPublisherTopic = (String) configConstants.get("metrics.publisher.topic");
-
-		searchElsCluster = (String) configConstants.get("search.elasticsearch.cluster");
-		searchElsHost = (String) configConstants.get("search.elasticsearch.ip");
-		searchIndexName = (String) configConstants.get("search.elasticsearch.index");
-		searchTypeName = (String) configConstants.get("search.elasticsearch.type");
-
-		plSqlUrl = (String) configConstants.get("postgresql.driverurl");
-		plSqlUserName = (String) configConstants.get("postgresql.username");
-		plSqlPassword = (String) configConstants.get("postgresql.password");
-
-		syncClassMembersInterval = Long.parseLong((String) configConstants.get("class.members.sync.delay"));
-		syncContentAuthrizersInterval = Long.parseLong((String) configConstants.get("content.authorizers.sync.delay"));
-		syncTotalCountsInterval = Long.parseLong((String) configConstants.get("total.counts.sync.delay"));
+		
 	}
 
 	private static class ConfigSettingsHolder {
@@ -93,23 +91,6 @@ public final class ConfigSettingsLoader {
 
 	public static ConfigSettingsLoader instance() {
 		return ConfigSettingsHolder.INSTANCE;
-	}
-
-	private void loadConfigSettings() {
-		try {
-			InputStream inputStream = null;
-			String propFileName = "settings.properties";
-			String configPath = System.getProperty("user.dir").concat("/");
-			inputStream = FileUtils.openInputStream(new File(configPath.concat(propFileName)));
-			configConstants.load(inputStream);
-			inputStream.close();
-		} catch (Exception e) {
-			LOG.error("Error while loading config properties.", e);
-		}
-	}
-
-	public Properties getConfigConstants() {
-		return configConstants;
 	}
 
 	public String getAnalyticsCassKeyspace() {

@@ -36,7 +36,8 @@ public class SyncClassMembers {
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getClassMembersSyncInterval();
 	
-	public static void main(String args[]) {
+	public SyncClassMembers() {
+		LOG.info("deploying SyncClassMembers....");
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
 		TimerTask task = new TimerTask() {

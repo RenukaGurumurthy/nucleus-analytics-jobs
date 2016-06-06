@@ -37,7 +37,8 @@ public class SyncTotalContentCounts {
 	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getTotalCountsSyncInterval();
 	
-	public static void main(String args[]) {
+	public SyncTotalContentCounts() {
+		LOG.info("deploying SyncTotalContentCounts....");
 		minuteDateFormatter.setTimeZone(TimeZone.getTimeZone(Constants.UTC));
 		final String jobLastUpdatedTime = getLastUpdatedTime();
 		TimerTask task = new TimerTask() {
@@ -66,7 +67,6 @@ public class SyncTotalContentCounts {
 					updateCounts(classId, lessonCount);
 				}
 				updateLastUpdatedTime(JOB_NAME, updatedTime == null ? currentTime : updatedTime);
-				LOG.info("connection going to close.....................");
 				Base.close();
 			}
 		};

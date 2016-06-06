@@ -24,7 +24,7 @@ public class EventMigration {
 			.prepare("INSERT INTO events_timeline(event_time,event_id)VALUES(?,?);");
 
 	public static void main(String args[]) {
-
+		LOG.info("deploying EventMigration....");
 		try {
 			String start = args[0];
 			String end = args[1];
@@ -42,11 +42,13 @@ public class EventMigration {
 				// Incrementing time - one minute
 				ColumnList<String> et = readWithKey(Constants.EVENT_TIMIELINE, currentDate);
 				for (String eventId : et.getColumnNames()) {
-					ColumnList<String> ef = readWithKey(Constants.EVENT_DETAIL, et.getStringValue(eventId, Constants.NA));
+					ColumnList<String> ef = readWithKey(Constants.EVENT_DETAIL,
+							et.getStringValue(eventId, Constants.NA));
 					// Insert event_time_line
 					insertData(currentDate, et.getStringValue(eventId, Constants.NA), insertEventTimeLine);
 					// Insert events
-					insertData(et.getStringValue(eventId, Constants.NA), ef.getStringValue(Constants.FIELDS, Constants.NA), insertEvents);
+					insertData(et.getStringValue(eventId, Constants.NA),
+							ef.getStringValue(Constants.FIELDS, Constants.NA), insertEvents);
 				}
 				startDate = new Date(startDate).getTime() + 60000;
 				Thread.sleep(200);
@@ -88,5 +90,6 @@ public class EventMigration {
 			e.printStackTrace();
 		}
 	}
+
 
 }

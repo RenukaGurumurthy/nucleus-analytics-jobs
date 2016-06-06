@@ -29,7 +29,9 @@ public class StatMetricsPublisher {
 	private static long JOB_DELAY = 0;
 	private static long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatPublisherInterval();
 	private static KafkaProducer<String, String> producer = connectionProvider.getKafkaProducer().getPublisher();
-	public static void main(String arg[]) {
+	
+	public StatMetricsPublisher()  {
+		LOG.info("deploying StatMetricsPublisher....");
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {

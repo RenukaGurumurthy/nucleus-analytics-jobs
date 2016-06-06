@@ -44,6 +44,7 @@ public class StatDataMigration {
 					"SELECT metrics_value AS metrics FROM statistical_data WHERE clustering_key = ? AND metrics_name = ?");
 
 	public static void main(String args[]) throws InterruptedException {
+		LOG.info("deploying StatDataMigration....");
 		LOG.info("Please make sure that we have loaded list of content oids in stat_publisher_queue column family.");
 		LOG.info("Press Ctrl+C if you want to kill process from job executed location.");
 		Thread.sleep(10000);
