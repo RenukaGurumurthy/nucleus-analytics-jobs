@@ -1,11 +1,8 @@
 package org.gooru.analyics.jobs.infra;
 
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class ConfigSettingsLoader {
-	private static final Logger LOG = LoggerFactory.getLogger(ConfigSettingsLoader.class);
 	private static String analyticsCassKeyspace = null;
 	private static String analyticsCassSeeds = null;
 	private static String analyticsCassDatacenter = null;

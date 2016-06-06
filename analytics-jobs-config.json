@@ -44,5 +44,11 @@
 
 "class.members.sync.delay":6000,
 "total.counts.sync.delay":6000,
-"content.authorizers.sync.delay":6000
+"content.authorizers.sync.delay":6000,
+
+"stat.publisher.worker.start":true,
+"sync.class.members.worker.start":true,
+"sync.content.authorized.users.worker.start":true,
+"sync.total.content.counts.worker.start":true
+
 }

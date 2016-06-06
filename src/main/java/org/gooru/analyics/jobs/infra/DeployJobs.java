@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import org.gooru.analyics.jobs.executor.StatDataMigration;
 import org.gooru.analyics.jobs.executor.StatMetricsPublisher;
 import org.gooru.analyics.jobs.executor.SyncClassMembers;
 import org.gooru.analyics.jobs.executor.SyncContentAuthorizedUsers;

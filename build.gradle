@@ -70,7 +70,7 @@ apply plugin: 'java'
  shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'org.gooru.migration.connections.ConnectionProvider'
+        attributes 'Main-Class': 'org.gooru.analyics.jobs.infra.DeployJobs'
         attributes 'Created-By' : 'Gooru.org'
     }
 }
