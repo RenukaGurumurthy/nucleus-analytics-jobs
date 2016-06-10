@@ -22,13 +22,13 @@ import com.datastax.driver.core.querybuilder.QueryBuilder;
 
 public class StatMetricsPublisher {
 	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
-	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
+    private static final ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final String KAFKA_QUEUE_TOPIC = connectionProvider.getMetricsPublisherQueueTopic();
 	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatPublisherQueueLimit();
-	private static Timer timer = new Timer();
-	private static long JOB_DELAY = 0;
-	private static long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatPublisherInterval();
-	private static KafkaProducer<String, String> producer = connectionProvider.getKafkaProducer().getPublisher();
+    private static final Timer timer = new Timer();
+    private static final long JOB_DELAY = 0;
+    private static final long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatPublisherInterval();
+    private static final KafkaProducer<String, String> producer = connectionProvider.getKafkaProducer().getPublisher();
 	
 	public StatMetricsPublisher()  {
 		LOG.info("deploying StatMetricsPublisher....");

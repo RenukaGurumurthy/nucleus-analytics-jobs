@@ -1,6 +1,7 @@
 package org.gooru.analyics.jobs.executor;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ public class SyncClassMembers {
 	private static final Logger LOG = LoggerFactory.getLogger(SyncClassMembers.class);
 	private static final String GET_MEMBERS_QUERY = "select class_id,array_agg(user_id) as members ,now() as updated_at from class_member where class_member_status = 'joined' and updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes' group by class_id;";
 	private static String currentTime = null;
-	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getClassMembersSyncInterval();
 	
 	public SyncClassMembers() {
@@ -59,10 +60,8 @@ public class SyncClassMembers {
 					LOG.info("classId : " + classId);
 					HashSet<String> members = null;
 					if (classMembers != null) {
-						members = new HashSet<String>();
-						for (String c : (classMembers.replace("}", "").replace("{", "")).split(",")) {
-							members.add(c);
-						}
+						members = new HashSet<>();
+                        members.addAll(Arrays.asList((classMembers.replace("}", "").replace("{", "")).split(",")));
 					}
 					updateClassMembers(classId,members);
 				}

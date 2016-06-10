@@ -37,7 +37,7 @@ public final class ArchivedCassandraClusterClient {
 				.withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
 				.buildKeyspace(ThriftFamilyFactory.getInstance());
 		context.start();
-		cassandraKeyspace = (Keyspace) context.getClient();
+		cassandraKeyspace = context.getClient();
 		LOG.info("Archieved Cassandra initialized successfully");
 	}
 

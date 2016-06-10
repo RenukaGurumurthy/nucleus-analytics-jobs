@@ -4,7 +4,7 @@ import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PostgreSQLConnection {
+public final class PostgreSQLConnection {
 	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(PostgreSQLConnection.class);
 	PostgreSQLConnection() {

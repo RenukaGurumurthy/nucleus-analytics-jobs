@@ -1,6 +1,6 @@
 package org.gooru.analyics.jobs.constants;
 
-public class Constants {
+public final class Constants {
 	public static final String NA = "NA";
 	public static final String FIELDS = "fields";
 	public static final String EVENT_TIMIELINE = "event_timeline";
@@ -60,4 +60,8 @@ public class Constants {
 	public static final String TOTAL_COUNTS = "totalCounts";
 	public static final String CLASS_CONTENT_COUNT = "class_content_count";
 	public static final String UTC = "UTC";
+
+    private Constants() {
+        throw new AssertionError();
+    }
 }

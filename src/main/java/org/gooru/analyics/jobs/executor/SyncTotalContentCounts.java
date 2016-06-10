@@ -34,7 +34,7 @@ public class SyncTotalContentCounts {
 			.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncTotalContentCounts.class);
 	private static String currentTime = null;
-	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getTotalCountsSyncInterval();
 	
 	public SyncTotalContentCounts() {
@@ -75,7 +75,7 @@ public class SyncTotalContentCounts {
 
 	private static void updateCounts(String classId, List<Map> collectionCount) {
 		try {
-			List<RegularStatement> stmtList = new ArrayList<RegularStatement>();
+			List<RegularStatement> stmtList = new ArrayList<>();
 			RegularStatement[] arr = new RegularStatement[0];
 
 			for (Map countDetails : collectionCount) {
