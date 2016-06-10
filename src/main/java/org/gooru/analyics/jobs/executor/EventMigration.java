@@ -1,5 +1,6 @@
 package org.gooru.analyics.jobs.executor;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -16,12 +17,12 @@ import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class EventMigration {
 	private static final Logger LOG = LoggerFactory.getLogger(EventMigration.class);
-	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
-	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
-	private static PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
-			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
-	private static PreparedStatement insertEventTimeLine = (connectionProvider.getAnalyticsCassandraSession())
-			.prepare("INSERT INTO events_timeline(event_time,event_id)VALUES(?,?);");
+    private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
+    private static final ConnectionProvider connectionProvider = ConnectionProvider.instance();
+    private static final PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
+         			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
+    private static final PreparedStatement insertEventTimeLine = (connectionProvider.getAnalyticsCassandraSession())
+         			.prepare("INSERT INTO events_timeline(event_time,event_id)VALUES(?,?);");
 
 	public static void main(String args[]) {
 		LOG.info("deploying EventMigration....");
@@ -53,13 +54,13 @@ public class EventMigration {
 				startDate = new Date(startDate).getTime() + 60000;
 				Thread.sleep(200);
 			}
-		} catch (Exception e) {
+        } catch (ParseException | InterruptedException e) {
 			if (e instanceof ArrayIndexOutOfBoundsException) {
 				LOG.info("startTime or endTime can not be null. Please make sure the class execution format as below.");
 				LOG.info(
 						"java -classpath build/libs/migration-scripts-fat.jar: org.gooru.migration.jobs.EventMigration 201508251405 201508251410");
 			} else {
-				LOG.error("Something went wrong...");
+                LOG.error("Something went wrong...", e);
 			}
 			System.exit(500);
 		}
@@ -74,9 +75,9 @@ public class EventMigration {
 					.setConsistencyLevel(ConsistencyLevel.CL_QUORUM).withRetryPolicy(new ConstantBackoff(2000, 5))
 					.getKey(key).execute().getResult();
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            LOG.error("Failure in reading with key", e);
+        }
 
 		return result;
 	}
@@ -86,8 +87,8 @@ public class EventMigration {
 			BoundStatement boundStatement = new BoundStatement(preparedStatement);
 			boundStatement.bind(key, column);
 			(connectionProvider.getAnalyticsCassandraSession()).executeAsync(boundStatement);
-		} catch (Exception e) {
-			e.printStackTrace();
+        } catch (Exception e) {
+            LOG.error("Inserting Data failed with exception: ", e);
 		}
 	}
 

@@ -34,7 +34,7 @@ public class SyncContentAuthorizedUsers {
 	private static final Logger LOG = LoggerFactory.getLogger(SyncContentAuthorizedUsers.class);
 	private static final String GET_AUTHORIZED_USERS_QUERY = "select id,creator_id,collaborator,updated_at from class where class.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
 	private static String currentTime = null;
-	private static SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static final long JOB_INTERVAL = configSettingsLoader.getTotalCountsSyncInterval();
 	
 	public SyncContentAuthorizedUsers()  {
@@ -62,7 +62,7 @@ public class SyncContentAuthorizedUsers {
 					LOG.info("class : " + classId);
 					if (collabs != null) {
 						JSONArray collabsArray = new JSONArray(collabs.toString());
-						collaborators = new HashSet<String>();
+						collaborators = new HashSet<>();
 						for (int index = 0; index < collabsArray.length(); index++) {
 							collaborators.add(collabsArray.getString(index));
 						}

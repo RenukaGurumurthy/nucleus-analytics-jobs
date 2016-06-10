@@ -28,7 +28,7 @@ import com.netflix.astyanax.retry.ConstantBackoff;
 
 public class StatDataMigration {
 	private static final Logger LOG = LoggerFactory.getLogger(StatDataMigration.class);
-	private static ConnectionProvider connectionProvider = ConnectionProvider.instance();
+    private static final ConnectionProvider connectionProvider = ConnectionProvider.instance();
 	private static final int QUEUE_LIMIT = connectionProvider.getConfigsettingsloader().getStatMigrationQueueLimit();
 	private static final String indexName = connectionProvider.getConfigsettingsloader().getSearchElsIndex();
 	private static final String typeName = connectionProvider.getConfigsettingsloader().getSearchElsType();
@@ -36,11 +36,13 @@ public class StatDataMigration {
 	private static final long JOB_DELAY = 0;
 	private static final long JOB_INTERVAL = connectionProvider.getConfigsettingsloader().getStatMigrationInterval();
 	private static XContentBuilder contentBuilder = null;
-	private static PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = connectionProvider.getAnalyticsCassandraSession()
-			.prepare(
+    private static final PreparedStatement UPDATE_STATISTICAL_COUNTER_DATA = connectionProvider
+            .getAnalyticsCassandraSession()
+         			.prepare(
 					"UPDATE statistical_data SET metrics_value = metrics_value+? WHERE clustering_key = ? AND metrics_name = ?");
-	private static PreparedStatement SELECT_STATISTICAL_COUNTER_DATA = connectionProvider.getAnalyticsCassandraSession()
-			.prepare(
+    private static final PreparedStatement SELECT_STATISTICAL_COUNTER_DATA = connectionProvider
+            .getAnalyticsCassandraSession()
+         			.prepare(
 					"SELECT metrics_value AS metrics FROM statistical_data WHERE clustering_key = ? AND metrics_name = ?");
 
 	public static void main(String args[]) throws InterruptedException {
@@ -189,7 +191,7 @@ public class StatDataMigration {
 					existingValue = resultRow.getLong(Constants.METRICS);
 				}
 			}
-			long balancedMatrics = ((Number) metricsValue).longValue() - existingValue;
+			long balancedMatrics = metricsValue - existingValue;
 
 			BoundStatement boundStatement = new BoundStatement(UPDATE_STATISTICAL_COUNTER_DATA);
 			boundStatement.bind(balancedMatrics, clusteringKey, metricsName);

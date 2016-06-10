@@ -21,7 +21,7 @@ public final class ConnectionProvider {
 
 	private static final ElasticsearchClusterClient elasticsearchClusterClient = ElasticsearchClusterClient.instance();
 
-	private static PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
+    private static final PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
 
 	public Client getSearchElsClient() {
 		return elasticsearchClusterClient.getElsClient();
@@ -67,7 +67,7 @@ public final class ConnectionProvider {
 
 		ColumnFamily<String, String> aggregateColumnFamily;
 
-		aggregateColumnFamily = new ColumnFamily<String, String>(columnFamilyName, StringSerializer.get(),
+		aggregateColumnFamily = new ColumnFamily<>(columnFamilyName, StringSerializer.get(),
 				StringSerializer.get());
 
 		return aggregateColumnFamily;

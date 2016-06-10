@@ -17,7 +17,8 @@ public class DeployJobs {
 	private static final Logger LOG = LoggerFactory.getLogger(DeployJobs.class);
 	
 	public static void main(String args[]) {
-		JSONObject config = loadConfig(args);
+        JSONObject config = loadConfig(args);
+        // FIXME: Why are two new calls made and ignored the result? Are we expecting side effects?
 		new ConfigSettingsLoader(config);
 		new ConnectionProvider();
 
@@ -47,13 +48,13 @@ public class DeployJobs {
 				try {
 					conf = new JSONObject(sconf);
 				} catch (Exception e) {
-					System.out.println("Configuration file " + sconf + " does not contain a valid JSON object");
+                    LOG.warn("Configuration file '{}' does not contain a valid JSON object", sconf, e);
 				}
 			} catch (FileNotFoundException e) {
 				try {
 					conf = new JSONObject(confArg);
 				} catch (Exception e2) {
-					System.out.println("-conf option does not point to a file and is not valid JSON: " + confArg);
+                    LOG.warn("-conf option does not point to a file and is not valid JSON: '{}'", confArg);
 				}
 			}
 		}
