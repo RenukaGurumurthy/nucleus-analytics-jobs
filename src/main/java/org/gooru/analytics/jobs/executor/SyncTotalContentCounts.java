@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.gooru.analytics.jobs.constants.Constants;
 import org.gooru.analytics.jobs.infra.AnalyticsUsageCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.PostgreSQLConnection;
 import org.gooru.analytics.jobs.infra.startup.JobInitializer;
 import org.javalite.activejdbc.Base;
 import org.slf4j.Logger;
@@ -32,6 +33,7 @@ public class SyncTotalContentCounts implements JobInitializer {
 	private static final String JOB_NAME = "sync_total_content_counts";
 	private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient
 			.instance();
+	private static final PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncTotalContentCounts.class);
 	private static String currentTime = null;
     private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -54,7 +56,7 @@ public class SyncTotalContentCounts implements JobInitializer {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				Base.openTransaction();
+				postgreSQLConnection.initializeComponent(config);
 				if (currentTime != null) {
 					currentTime = minuteDateFormatter.format(new Date());
 				} else {
@@ -77,7 +79,7 @@ public class SyncTotalContentCounts implements JobInitializer {
 					updateCounts(classId, lessonCount);
 				}
 				updateLastUpdatedTime(JOB_NAME, updatedTime == null ? currentTime : updatedTime);
-				Base.close();
+				postgreSQLConnection.finalizeComponent();
 			}
 		};
 		timer.scheduleAtFixedRate(task, 0, JOB_INTERVAL);

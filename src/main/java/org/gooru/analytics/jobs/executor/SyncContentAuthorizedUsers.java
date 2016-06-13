@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import org.gooru.analytics.jobs.constants.Constants;
 import org.gooru.analytics.jobs.infra.AnalyticsUsageCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.PostgreSQLConnection;
 import org.gooru.analytics.jobs.infra.startup.JobInitializer;
 import org.javalite.activejdbc.Base;
 import org.json.JSONArray;
@@ -31,6 +32,7 @@ public class SyncContentAuthorizedUsers implements JobInitializer {
 	private static final String JOB_NAME = "sync_content_authorized_users";
 	private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient
 			.instance();
+	private static final PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(SyncContentAuthorizedUsers.class);
 	private static final String GET_AUTHORIZED_USERS_QUERY = "select id,creator_id,collaborator,updated_at from class where class.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
 	private static String currentTime = null;
@@ -53,7 +55,7 @@ public class SyncContentAuthorizedUsers implements JobInitializer {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				Base.openTransaction();
+				postgreSQLConnection.initializeComponent(config);
 				if (currentTime != null) {
 					currentTime = minuteDateFormatter.format(new Date());
 				} else {
@@ -79,7 +81,7 @@ public class SyncContentAuthorizedUsers implements JobInitializer {
 					updateAuthorizedUsers(classId, creator, collaborators);
 				}
 				updateLastUpdatedTime(JOB_NAME, updatedTime == null ? currentTime : updatedTime);
-				Base.close();
+				postgreSQLConnection.finalizeComponent();
 			}
 		};
 		timer.scheduleAtFixedRate(task, 0, JOB_INTERVAL);

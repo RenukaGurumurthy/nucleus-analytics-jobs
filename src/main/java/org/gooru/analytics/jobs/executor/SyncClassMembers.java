@@ -55,7 +55,7 @@ public class SyncClassMembers implements JobInitializer {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				Base.openTransaction();
+				postgreSQLConnection.initializeComponent(config);
 				if (currentTime != null) {
 					currentTime = minuteDateFormatter.format(new Date());
 				} else {
@@ -77,7 +77,7 @@ public class SyncClassMembers implements JobInitializer {
 					updateClassMembers(classId,members);
 				}
 				updateLastUpdatedTime(JOB_NAME, updatedTime == null ? currentTime : updatedTime);
-				Base.close();
+				postgreSQLConnection.finalizeComponent();
 			}
 		};
 		timer.scheduleAtFixedRate(task, 0, JOB_INTERVAL);
