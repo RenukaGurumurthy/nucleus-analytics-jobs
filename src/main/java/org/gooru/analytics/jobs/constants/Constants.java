@@ -1,4 +1,4 @@
-package org.gooru.analyics.jobs.constants;
+package org.gooru.analytics.jobs.constants;
 
 public final class Constants {
 	public static final String NA = "NA";

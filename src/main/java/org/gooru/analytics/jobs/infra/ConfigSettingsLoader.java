@@ -1,4 +1,4 @@
-package org.gooru.analyics.jobs.infra;
+package org.gooru.analytics.jobs.infra;
 
 import org.json.JSONObject;
 
@@ -38,6 +38,7 @@ public final class ConfigSettingsLoader {
 	private static long syncClassMembersInterval = 0L;
 	private static long syncContentAuthrizersInterval = 0L;
 	private static long syncTotalCountsInterval = 0L;
+	private static boolean configLoaderStatus = false;
 	
 	ConfigSettingsLoader(JSONObject config) {
 
@@ -76,12 +77,11 @@ public final class ConfigSettingsLoader {
 		syncClassMembersInterval = config.getLong("class.members.sync.delay");
 		syncContentAuthrizersInterval = config.getLong("content.authorizers.sync.delay");
 		syncTotalCountsInterval =config.getLong("total.counts.sync.delay");
-		
+		configLoaderStatus = true;
 	}
-	ConfigSettingsLoader() {
-		
-	}
-
+	
+	ConfigSettingsLoader(){}
+	
 	private static class ConfigSettingsHolder {
 		public static final ConfigSettingsLoader INSTANCE = new ConfigSettingsLoader();
 	}
@@ -195,5 +195,8 @@ public final class ConfigSettingsLoader {
 	}
 	public long getContentAuthorizersSyncInterval() {
 		return syncContentAuthrizersInterval;
+	}
+	public static boolean getConfigLoaderStatus(){
+		return configLoaderStatus;
 	}
 }

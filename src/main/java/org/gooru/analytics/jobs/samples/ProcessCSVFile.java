@@ -1,11 +1,11 @@
-package org.gooru.analyics.jobs.samples;
+package org.gooru.analytics.jobs.samples;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
-import org.gooru.analyics.jobs.infra.EventCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.EventCassandraClusterClient;
 
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.querybuilder.Insert;

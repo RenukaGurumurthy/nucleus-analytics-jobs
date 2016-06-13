@@ -1,11 +1,13 @@
-package org.gooru.analyics.jobs.executor;
+package org.gooru.analytics.jobs.executor;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.gooru.analyics.jobs.constants.Constants;
-import org.gooru.analyics.jobs.infra.ConnectionProvider;
+import org.gooru.analytics.jobs.constants.Constants;
+import org.gooru.analytics.jobs.infra.ArchivedCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.EventCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.startup.JobInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,20 +17,34 @@ import com.netflix.astyanax.model.ColumnList;
 import com.netflix.astyanax.model.ConsistencyLevel;
 import com.netflix.astyanax.retry.ConstantBackoff;
 
-public class EventMigration {
+import io.vertx.core.json.JsonObject;
+
+public class EventMigration implements JobInitializer{
 	private static final Logger LOG = LoggerFactory.getLogger(EventMigration.class);
     private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
-    private static final ConnectionProvider connectionProvider = ConnectionProvider.instance();
-    private static final PreparedStatement insertEvents = (connectionProvider.getAnalyticsCassandraSession())
+    private static final EventCassandraClusterClient eventCassandraClusterClient = EventCassandraClusterClient
+			.instance();
+    private static final ArchivedCassandraClusterClient archivedCassandraClusterClient = ArchivedCassandraClusterClient
+			.instance();
+    private static final PreparedStatement insertEvents = (eventCassandraClusterClient.getCassandraSession())
          			.prepare("INSERT INTO events(event_id,fields)VALUES(?,?)");
-    private static final PreparedStatement insertEventTimeLine = (connectionProvider.getAnalyticsCassandraSession())
+    private static final PreparedStatement insertEventTimeLine = (eventCassandraClusterClient.getCassandraSession())
          			.prepare("INSERT INTO events_timeline(event_time,event_id)VALUES(?,?);");
 
-	public static void main(String args[]) {
+    private static class EventMigrationHolder {
+		public static final EventMigration INSTANCE = new EventMigration();
+	}
+
+	public static EventMigration instance() {
+		return EventMigrationHolder.INSTANCE;
+	}
+	
+    public void deployJob(JsonObject config){
+
 		LOG.info("deploying EventMigration....");
 		try {
-			String start = args[0];
-			String end = args[1];
+			String start = "201508251405";
+			String end = "201508251405";
 
 			Long startTime = minuteDateFormatter.parse(start).getTime();
 			LOG.info("startTime : " + start);
@@ -64,14 +80,15 @@ public class EventMigration {
 			}
 			System.exit(500);
 		}
-	}
+	   	
+    }
 
 	public static ColumnList<String> readWithKey(String cfName, String key) {
 
 		ColumnList<String> result = null;
 		try {
-			result = (connectionProvider.getCassandraKeyspace())
-					.prepareQuery(connectionProvider.accessColumnFamily(cfName))
+			result = (archivedCassandraClusterClient.getCassandraKeyspace())
+					.prepareQuery(archivedCassandraClusterClient.accessColumnFamily(cfName))
 					.setConsistencyLevel(ConsistencyLevel.CL_QUORUM).withRetryPolicy(new ConstantBackoff(2000, 5))
 					.getKey(key).execute().getResult();
 
@@ -86,7 +103,7 @@ public class EventMigration {
 		try {
 			BoundStatement boundStatement = new BoundStatement(preparedStatement);
 			boundStatement.bind(key, column);
-			(connectionProvider.getAnalyticsCassandraSession()).executeAsync(boundStatement);
+			(eventCassandraClusterClient.getCassandraSession()).executeAsync(boundStatement);
         } catch (Exception e) {
             LOG.error("Inserting Data failed with exception: ", e);
 		}

@@ -1,4 +1,4 @@
-package org.gooru.analyics.jobs.infra;
+package org.gooru.analytics.jobs.infra;
 
 import org.elasticsearch.client.Client;
 
@@ -6,6 +6,8 @@ import com.datastax.driver.core.Session;
 import com.netflix.astyanax.Keyspace;
 import com.netflix.astyanax.model.ColumnFamily;
 import com.netflix.astyanax.serializers.StringSerializer;
+
+import io.vertx.core.json.JsonObject;
 
 public final class ConnectionProvider {
 
@@ -22,7 +24,10 @@ public final class ConnectionProvider {
 	private static final ElasticsearchClusterClient elasticsearchClusterClient = ElasticsearchClusterClient.instance();
 
     private static final PostgreSQLConnection postgreSQLConnection = PostgreSQLConnection.instance();
-
+    
+    private static boolean connectionProviderStatus = true;
+    
+    
 	public Client getSearchElsClient() {
 		return elasticsearchClusterClient.getElsClient();
 	}
@@ -52,7 +57,7 @@ public final class ConnectionProvider {
 	}
 
 	public void openPSQLConnection(){
-		postgreSQLConnection.intializeConnection();
+		postgreSQLConnection.initializeComponent(new JsonObject());
 	}
 	
 	private static class CassandraClientHolder {
@@ -63,6 +68,9 @@ public final class ConnectionProvider {
 		return CassandraClientHolder.INSTANCE;
 	}
 
+	public static boolean getConnectionProviderStatus(){
+		return connectionProviderStatus;
+	}
 	public ColumnFamily<String, String> accessColumnFamily(String columnFamilyName) {
 
 		ColumnFamily<String, String> aggregateColumnFamily;

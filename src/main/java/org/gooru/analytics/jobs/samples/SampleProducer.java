@@ -1,4 +1,4 @@
-package org.gooru.analyics.jobs.samples;
+package org.gooru.analytics.jobs.samples;
 
 import java.io.IOException;
 import java.util.Properties;

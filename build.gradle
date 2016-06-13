@@ -25,6 +25,7 @@ plugins {
 defaultTasks 'shadowJar'
 
 ext {
+	vertxVersion = '3.2.1'
     hikariVersion = '2.4.3'
     postgresVersion = '9.4-1206-jdbc42'
 }
@@ -39,6 +40,12 @@ repositories {
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
+     // Vertx specific dependencies
+    compile "io.vertx:vertx-core:${vertxVersion}"
+    compile "io.vertx:vertx-hazelcast:${vertxVersion}"
+    compile "io.vertx:vertx-web:${vertxVersion}"
+    compile "io.vertx:vertx-dropwizard-metrics:${vertxVersion}"
+ 
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.13'
     compile 'com.google.guava:guava:14.0.1'
@@ -70,9 +77,12 @@ apply plugin: 'java'
  shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'org.gooru.analyics.jobs.infra.DeployJobs'
-        attributes 'Created-By' : 'Gooru.org'
+        attributes 'Main-Class': 'io.vertx.core.Launcher'
+        attributes 'Main-Verticle': 'org.gooru.analyics.jobs.infra.DeployJobs'
+        attributes 'Created-By': 'Gooru.org'
     }
 }
  
-
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}

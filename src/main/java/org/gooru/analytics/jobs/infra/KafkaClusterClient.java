@@ -1,20 +1,20 @@
-package org.gooru.analyics.jobs.infra;
+package org.gooru.analytics.jobs.infra;
 
 import java.util.Properties;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.gooru.analytics.jobs.infra.shutdown.Finalizer;
+import org.gooru.analytics.jobs.infra.startup.Initializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KafkaClusterClient {
+import io.vertx.core.json.JsonObject;
+
+public class KafkaClusterClient implements Initializer,Finalizer {
 
 	private static KafkaProducer<String, String> producer = null;
-	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
+	private static String kafkaBrokers = null;
 	private static final Logger LOG = LoggerFactory.getLogger(KafkaClusterClient.class);
-	KafkaClusterClient() {
-		initializeKafkaConnection(configSettingsLoader.getKakaBrokers());
-		LOG.info("Kafka Cluster initialized successfully..");
-	}
 
 	private static class KafkaConnectionHolder {
 		public static final KafkaClusterClient INSTANCE = new KafkaClusterClient();
@@ -24,9 +24,12 @@ public class KafkaClusterClient {
 		return KafkaConnectionHolder.INSTANCE;
 	}
 
-	private static void initializeKafkaConnection(String brokers) {
+	public void initializeComponent(JsonObject config) {
+		kafkaBrokers = config.getString("kafka.brokers");
+		LOG.info("kafkaBrokers : {} ", kafkaBrokers);
+		
 		Properties props = new Properties();
-		props.put("bootstrap.servers", brokers);
+		props.put("bootstrap.servers", kafkaBrokers);
 		props.put("acks", "all");
 		props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -36,9 +39,14 @@ public class KafkaClusterClient {
 		props.put("block.on.buffer.full", true);
 		props.put("auto.commit.interval.ms", 1000);
 		producer = new KafkaProducer<>(props);
+		LOG.info("Kafka initialized successfully...");
 	}
 
 	public KafkaProducer<String, String> getPublisher() {
 		return producer;
+	}
+
+	public void finalizeComponent(){
+		producer.close();
 	}
 }
