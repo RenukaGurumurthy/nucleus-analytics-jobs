@@ -78,7 +78,7 @@ apply plugin: 'java'
     classifier = 'fat'
     manifest {
         attributes 'Main-Class': 'io.vertx.core.Launcher'
-        attributes 'Main-Verticle': 'org.gooru.analyics.jobs.infra.DeployJobs'
+        attributes 'Main-Verticle': 'org.gooru.analytics.jobs.infra.DeployJobs'
         attributes 'Created-By': 'Gooru.org'
     }
 }
