@@ -12,46 +12,45 @@ import com.datastax.driver.core.policies.ExponentialReconnectionPolicy;
 
 import io.vertx.core.json.JsonObject;
 
-public final class EventCassandraClusterClient implements Initializer,Finalizer{
+public final class EventCassandraClusterClient implements Initializer, Finalizer {
 
-	private static Session session = null;
-	private static final Logger LOG = LoggerFactory.getLogger(EventCassandraClusterClient.class);
-	private static String eventCassSeeds = null;
-	private static String eventCassDatacenter = null;
-	private static String eventCassCluster = null;
-	private static String eventCassKeyspace = null;
-	
-	public Session getCassandraSession() {
-		return session;
-	}
+  private static Session session = null;
+  private static final Logger LOG = LoggerFactory.getLogger(EventCassandraClusterClient.class);
+  private static String eventCassSeeds = null;
+  private static String eventCassDatacenter = null;
+  private static String eventCassCluster = null;
+  private static String eventCassKeyspace = null;
 
-	public String getCassKeyspace() {
-		return eventCassKeyspace;
-	}
+  public Session getCassandraSession() {
+    return session;
+  }
 
-	public void initializeComponent(JsonObject config) {
-		eventCassSeeds = config.getString("event.cassandra.seeds");
-		eventCassDatacenter = config.getString("event.cassandra.datacenter");
-		eventCassCluster = config.getString("event.cassandra.cluster");
-		eventCassKeyspace = config.getString("event.cassandra.keyspace");
-		LOG.info("eventCassSeeds : {} - eventCassKeyspace : {}",eventCassSeeds, eventCassKeyspace);
-	
-		Cluster cluster = Cluster.builder().withClusterName(eventCassCluster).addContactPoint(eventCassSeeds)
-				.withRetryPolicy(DefaultRetryPolicy.INSTANCE)
-				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
-		session = cluster.connect(eventCassKeyspace);
-		LOG.info("Event Cassandra Cluster Initialized successfully..");
-	}
-	
-	public void finalizeComponent(){
-		session.close();
-	}
-	
-	private static class EventCassandraClusterClientHolder {
-		public static final EventCassandraClusterClient INSTANCE = new EventCassandraClusterClient();
-	}
+  public String getCassKeyspace() {
+    return eventCassKeyspace;
+  }
 
-	public static EventCassandraClusterClient instance() {
-		return EventCassandraClusterClientHolder.INSTANCE;
-	}
+  public void initializeComponent(JsonObject config) {
+    eventCassSeeds = config.getString("event.cassandra.seeds");
+    eventCassDatacenter = config.getString("event.cassandra.datacenter");
+    eventCassCluster = config.getString("event.cassandra.cluster");
+    eventCassKeyspace = config.getString("event.cassandra.keyspace");
+    LOG.info("eventCassSeeds : {} - eventCassKeyspace : {}", eventCassSeeds, eventCassKeyspace);
+
+    Cluster cluster = Cluster.builder().withClusterName(eventCassCluster).addContactPoint(eventCassSeeds).withRetryPolicy(DefaultRetryPolicy.INSTANCE)
+            .withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
+    session = cluster.connect(eventCassKeyspace);
+    LOG.info("Event Cassandra Cluster Initialized successfully..");
+  }
+
+  public void finalizeComponent() {
+    session.close();
+  }
+
+  private static class EventCassandraClusterClientHolder {
+    public static final EventCassandraClusterClient INSTANCE = new EventCassandraClusterClient();
+  }
+
+  public static EventCassandraClusterClient instance() {
+    return EventCassandraClusterClientHolder.INSTANCE;
+  }
 }

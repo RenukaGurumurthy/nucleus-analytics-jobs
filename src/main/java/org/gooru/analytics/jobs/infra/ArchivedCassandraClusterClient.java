@@ -18,62 +18,59 @@ import com.netflix.astyanax.thrift.ThriftFamilyFactory;
 
 import io.vertx.core.json.JsonObject;
 
-public final class ArchivedCassandraClusterClient implements Initializer,Finalizer{
+public final class ArchivedCassandraClusterClient implements Initializer, Finalizer {
 
-	private static Keyspace cassandraKeyspace = null;
-	private static AstyanaxContext<Keyspace> context = null;
-	private static final Logger LOG = LoggerFactory.getLogger(ArchivedCassandraClusterClient.class);
-	private static String archivedCassSeeds = null;
-	private static String archivedCassDatacenter = null;
-	private static String archivedCassCluster = null;
-	private static String archivedCassKeyspace = null;
+  private static Keyspace cassandraKeyspace = null;
+  private static AstyanaxContext<Keyspace> context = null;
+  private static final Logger LOG = LoggerFactory.getLogger(ArchivedCassandraClusterClient.class);
+  private static String archivedCassSeeds = null;
+  private static String archivedCassDatacenter = null;
+  private static String archivedCassCluster = null;
+  private static String archivedCassKeyspace = null;
 
-	public void initializeComponent(JsonObject config){
-		
-		archivedCassSeeds = config.getString("archived.cassandra.seeds");
-		archivedCassDatacenter = config.getString("archived.cassandra.datacenter");
-		archivedCassCluster = config.getString("archived.cassandra.cluster");
-		archivedCassKeyspace = config.getString("archived.cassandra.keyspace");
-		
-		LOG.info("archivedCassSeeds : {} - archivedCassKeyspace : {} ", archivedCassSeeds, archivedCassKeyspace);
-		ConnectionPoolConfigurationImpl poolConfig = new ConnectionPoolConfigurationImpl("MyConnectionPool")
-				.setPort(9160).setSeeds(archivedCassSeeds).setSocketTimeout(30000).setMaxTimeoutWhenExhausted(2000)
-				.setMaxConnsPerHost(10).setInitConnsPerHost(1);
-		poolConfig.setLocalDatacenter(archivedCassDatacenter);
-		context = new AstyanaxContext.Builder().forCluster(archivedCassCluster)
-				.forKeyspace(archivedCassKeyspace)
-				.withAstyanaxConfiguration(new AstyanaxConfigurationImpl().setTargetCassandraVersion("2.1.4")
-						.setCqlVersion("3.0.0").setDiscoveryType(NodeDiscoveryType.RING_DESCRIBE)
-						.setConnectionPoolType(ConnectionPoolType.ROUND_ROBIN))
-				.withConnectionPoolConfiguration(poolConfig)
-				.withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
-				.buildKeyspace(ThriftFamilyFactory.getInstance());
-		context.start();
-		cassandraKeyspace = context.getClient();
-		LOG.info("Archieved Cassandra initialized successfully");
-	}
-	public Keyspace getCassandraKeyspace() {
-		return cassandraKeyspace;
-	}
+  public void initializeComponent(JsonObject config) {
 
-	public void finalizeComponent(){
-		context.shutdown();
-	}
-	
-	private static class ArchivedCassandraClusterClientHolder {
-		public static final ArchivedCassandraClusterClient INSTANCE = new ArchivedCassandraClusterClient();
-	}
+    archivedCassSeeds = config.getString("archived.cassandra.seeds");
+    archivedCassDatacenter = config.getString("archived.cassandra.datacenter");
+    archivedCassCluster = config.getString("archived.cassandra.cluster");
+    archivedCassKeyspace = config.getString("archived.cassandra.keyspace");
 
-	public static ArchivedCassandraClusterClient instance() {
-		return ArchivedCassandraClusterClientHolder.INSTANCE;
-	}
-	public ColumnFamily<String, String> accessColumnFamily(String columnFamilyName) {
+    LOG.info("archivedCassSeeds : {} - archivedCassKeyspace : {} ", archivedCassSeeds, archivedCassKeyspace);
+    ConnectionPoolConfigurationImpl poolConfig = new ConnectionPoolConfigurationImpl("MyConnectionPool").setPort(9160).setSeeds(archivedCassSeeds)
+            .setSocketTimeout(30000).setMaxTimeoutWhenExhausted(2000).setMaxConnsPerHost(10).setInitConnsPerHost(1);
+    poolConfig.setLocalDatacenter(archivedCassDatacenter);
+    context = new AstyanaxContext.Builder().forCluster(archivedCassCluster).forKeyspace(archivedCassKeyspace)
+            .withAstyanaxConfiguration(new AstyanaxConfigurationImpl().setTargetCassandraVersion("2.1.4").setCqlVersion("3.0.0")
+                    .setDiscoveryType(NodeDiscoveryType.RING_DESCRIBE).setConnectionPoolType(ConnectionPoolType.ROUND_ROBIN))
+            .withConnectionPoolConfiguration(poolConfig).withConnectionPoolMonitor(new CountingConnectionPoolMonitor())
+            .buildKeyspace(ThriftFamilyFactory.getInstance());
+    context.start();
+    cassandraKeyspace = context.getClient();
+    LOG.info("Archieved Cassandra initialized successfully");
+  }
 
-		ColumnFamily<String, String> aggregateColumnFamily;
+  public Keyspace getCassandraKeyspace() {
+    return cassandraKeyspace;
+  }
 
-		aggregateColumnFamily = new ColumnFamily<>(columnFamilyName, StringSerializer.get(),
-				StringSerializer.get());
+  public void finalizeComponent() {
+    context.shutdown();
+  }
 
-		return aggregateColumnFamily;
-	}
+  private static class ArchivedCassandraClusterClientHolder {
+    public static final ArchivedCassandraClusterClient INSTANCE = new ArchivedCassandraClusterClient();
+  }
+
+  public static ArchivedCassandraClusterClient instance() {
+    return ArchivedCassandraClusterClientHolder.INSTANCE;
+  }
+
+  public ColumnFamily<String, String> accessColumnFamily(String columnFamilyName) {
+
+    ColumnFamily<String, String> aggregateColumnFamily;
+
+    aggregateColumnFamily = new ColumnFamily<>(columnFamilyName, StringSerializer.get(), StringSerializer.get());
+
+    return aggregateColumnFamily;
+  }
 }

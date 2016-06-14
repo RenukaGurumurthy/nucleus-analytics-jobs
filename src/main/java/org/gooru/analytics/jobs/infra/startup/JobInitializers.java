@@ -11,32 +11,32 @@ import org.gooru.analytics.jobs.executor.SyncTotalContentCounts;
 
 public class JobInitializers implements Iterable<JobInitializer> {
 
-	private final Iterator<JobInitializer> internalIterator;
+  private final Iterator<JobInitializer> internalIterator;
 
-	public JobInitializers() {
-		List<JobInitializer> initializers = new ArrayList<>();
-		initializers.add(SyncTotalContentCounts.instance());
-		initializers.add(SyncContentAuthorizedUsers.instance());
-		initializers.add(SyncClassMembers.instance());
-		initializers.add(StatMetricsPublisher.instance());
-		internalIterator = initializers.iterator();
-	}
+  public JobInitializers() {
+    List<JobInitializer> initializers = new ArrayList<>();
+    initializers.add(SyncTotalContentCounts.instance());
+    initializers.add(SyncContentAuthorizedUsers.instance());
+    initializers.add(SyncClassMembers.instance());
+    initializers.add(StatMetricsPublisher.instance());
+    internalIterator = initializers.iterator();
+  }
 
-	@Override
-	public Iterator<JobInitializer> iterator() {
-		return new Iterator<JobInitializer>() {
+  @Override
+  public Iterator<JobInitializer> iterator() {
+    return new Iterator<JobInitializer>() {
 
-			@Override
-			public boolean hasNext() {
-				return internalIterator.hasNext();
-			}
+      @Override
+      public boolean hasNext() {
+        return internalIterator.hasNext();
+      }
 
-			@Override
-			public JobInitializer next() {
-				return internalIterator.next();
-			}
+      @Override
+      public JobInitializer next() {
+        return internalIterator.next();
+      }
 
-		};
-	}
+    };
+  }
 
 }

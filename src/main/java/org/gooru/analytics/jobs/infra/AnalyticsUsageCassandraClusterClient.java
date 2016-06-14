@@ -12,47 +12,46 @@ import com.datastax.driver.core.policies.ExponentialReconnectionPolicy;
 
 import io.vertx.core.json.JsonObject;
 
-public final class AnalyticsUsageCassandraClusterClient implements Initializer,Finalizer {
+public final class AnalyticsUsageCassandraClusterClient implements Initializer, Finalizer {
 
-	private static Session session = null;
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsUsageCassandraClusterClient.class);
-	private static String analyticsCassSeeds = null;
-	private static String analyticsCassDatacenter = null;
-	private static String analyticsCassCluster = null;
-	private static String analyticsCassKeyspace = null;
+  private static Session session = null;
+  private static final Logger LOG = LoggerFactory.getLogger(AnalyticsUsageCassandraClusterClient.class);
+  private static String analyticsCassSeeds = null;
+  private static String analyticsCassDatacenter = null;
+  private static String analyticsCassCluster = null;
+  private static String analyticsCassKeyspace = null;
 
-	public Session getCassandraSession() {
-		return session;
-	}
-	
-	public String getAnalyticsCassKeyspace() {
-		return analyticsCassKeyspace;
-	}
-	
-	private static class AnalyticsUsageCassandraClusterClientHolder {
-		public static final AnalyticsUsageCassandraClusterClient INSTANCE = new AnalyticsUsageCassandraClusterClient();
-	}
+  public Session getCassandraSession() {
+    return session;
+  }
 
-	public static AnalyticsUsageCassandraClusterClient instance() {
-		return AnalyticsUsageCassandraClusterClientHolder.INSTANCE;
-	}
+  public String getAnalyticsCassKeyspace() {
+    return analyticsCassKeyspace;
+  }
 
-	public void initializeComponent(JsonObject config) {
-		analyticsCassSeeds = config.getString("analytics.cassandra.seeds");
-		analyticsCassDatacenter = config.getString("analytics.cassandra.datacenter");
-		analyticsCassCluster = config.getString("analytics.cassandra.cluster");
-		analyticsCassKeyspace = config.getString("analytics.cassandra.keyspace");
-		LOG.info("analyticsCassSeeds : {} - analyticsCassKeyspace : {} ", analyticsCassSeeds, analyticsCassKeyspace);
+  private static class AnalyticsUsageCassandraClusterClientHolder {
+    public static final AnalyticsUsageCassandraClusterClient INSTANCE = new AnalyticsUsageCassandraClusterClient();
+  }
 
-		Cluster cluster = Cluster.builder().withClusterName(analyticsCassCluster).addContactPoint(analyticsCassSeeds)
-				.withRetryPolicy(DefaultRetryPolicy.INSTANCE)
-				.withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
-		session = cluster.connect(analyticsCassKeyspace);
-		
-		LOG.info("Analytics Cassandra initialized successfully...");
-	}
-	
-	public void finalizeComponent(){
-		session.close();
-	}
+  public static AnalyticsUsageCassandraClusterClient instance() {
+    return AnalyticsUsageCassandraClusterClientHolder.INSTANCE;
+  }
+
+  public void initializeComponent(JsonObject config) {
+    analyticsCassSeeds = config.getString("analytics.cassandra.seeds");
+    analyticsCassDatacenter = config.getString("analytics.cassandra.datacenter");
+    analyticsCassCluster = config.getString("analytics.cassandra.cluster");
+    analyticsCassKeyspace = config.getString("analytics.cassandra.keyspace");
+    LOG.info("analyticsCassSeeds : {} - analyticsCassKeyspace : {} ", analyticsCassSeeds, analyticsCassKeyspace);
+
+    Cluster cluster = Cluster.builder().withClusterName(analyticsCassCluster).addContactPoint(analyticsCassSeeds)
+            .withRetryPolicy(DefaultRetryPolicy.INSTANCE).withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
+    session = cluster.connect(analyticsCassKeyspace);
+
+    LOG.info("Analytics Cassandra initialized successfully...");
+  }
+
+  public void finalizeComponent() {
+    session.close();
+  }
 }
