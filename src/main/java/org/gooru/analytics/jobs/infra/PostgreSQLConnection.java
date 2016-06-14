@@ -27,13 +27,12 @@ public final class PostgreSQLConnection implements Initializer,Finalizer{
 		plSqlUrl = config.getString("postgresql.driverurl");
 		plSqlUserName = config.getString("postgresql.username");
 		plSqlPassword = config.getString("postgresql.password");
-		LOG.info("plSqlUrl : {} ",plSqlUrl);
+
 		try {
 			if (!Base.hasConnection()) {
 				Base.open("org.postgresql.Driver", plSqlUrl, plSqlUserName, plSqlPassword);
 			}
 			Base.openTransaction();
-			LOG.info("PLSQL initialized successfully...");
 		} catch (Exception e) {
 			LOG.error("Error while initializing postgreSQL....{}", e);
 		}

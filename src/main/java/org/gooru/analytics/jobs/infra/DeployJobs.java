@@ -19,8 +19,7 @@ public class DeployJobs extends AbstractVerticle {
 	
 	@Override
 	public void start(Future<Void> startFuture) throws Exception {
-		LOG.info("Calling DeployJobs....");
-
+		LOG.info("starting jobs and compenents....");
         Future<Void> startApplicationFuture = Future.future();
         Future<Void> startJobFuture = Future.future();
         
@@ -29,10 +28,10 @@ public class DeployJobs extends AbstractVerticle {
         
         CompositeFuture.all(startApplicationFuture,startJobFuture).setHandler(result -> {
             if (result.succeeded()) {
-                LOG.info("All jobs deployed and application started successfully");
+                LOG.info("All jobs deployed and compenents started successfully");
                 startFuture.complete();
             } else {
-                LOG.error("Deployment or app startup failure", result.cause());
+                LOG.error("Deployment or compenents startup failure", result.cause());
                 startFuture.fail(result.cause());
 
                 // Not much options now, no point in continuing
@@ -44,41 +43,15 @@ public class DeployJobs extends AbstractVerticle {
 	
 	@Override
 	public void stop(Future<Void> stopFuture) throws Exception {
-		LOG.info("Ending DeployJobs....");
+		LOG.info("stopping all components....");
 		shutdownApplication(stopFuture);
 	}
-	/*public static void main(String args[]) {
-		JSONObject config = loadConfig(args);
-		LOG.info("config :" + config);
-		if (config != null) {
-			new ConfigSettingsLoader(config);
-		}
-		if (ConfigSettingsLoader.getConfigLoaderStatus()) {
-			ConnectionProvider.instance();
-		}
-		if (ConnectionProvider.getConnectionProviderStatus()) {
-			if (config.getBoolean("stat.publisher.worker.start")) {
-				new StatMetricsPublisher();
-			}
-			if (config.getBoolean("sync.class.members.worker.start")) {
-				new SyncClassMembers();
-			}
-			if (config.getBoolean("sync.content.authorized.users.worker.start")) {
-				new SyncContentAuthorizedUsers();
-			}
-			if (config.getBoolean("sync.total.content.counts.worker.start")) {
-				new SyncTotalContentCounts();
-			}
-			LOG.info("All jobs started.....");
-		}
-	}*/
 	
 	private void startJob(Future<Void> startJobFuture) {
         vertx.executeBlocking(future -> {
             JobInitializers jobInitializers = new JobInitializers();
             try {
                 for (JobInitializer jobInitializer : jobInitializers) {
-                	LOG.debug("Job name : " + jobInitializer.getClass().getName());
                 	jobInitializer.deployJob(config());
                 }
                 future.complete();
@@ -105,12 +78,12 @@ public class DeployJobs extends AbstractVerticle {
                 }
                 future.complete();
             } catch (IllegalStateException ie) {
-                LOG.error("Error initializing application", ie);
+                LOG.error("Error initializing compenents", ie);
                 future.fail(ie);
             }
         }, result -> {
             if (result.succeeded()) {
-                LOG.info("All collection started successfully");
+                LOG.info("All compenents started successfully");
                 startApplicationFuture.complete();
             } else {
                 LOG.warn("Connections startup failure", result.cause());

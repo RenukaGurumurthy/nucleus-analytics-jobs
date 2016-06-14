@@ -22,7 +22,6 @@ public final class ArchivedCassandraClusterClient implements Initializer,Finaliz
 
 	private static Keyspace cassandraKeyspace = null;
 	private static AstyanaxContext<Keyspace> context = null;
-	private static final ConfigSettingsLoader configSettingsLoader = ConfigSettingsLoader.instance();
 	private static final Logger LOG = LoggerFactory.getLogger(ArchivedCassandraClusterClient.class);
 	private static String archivedCassSeeds = null;
 	private static String archivedCassDatacenter = null;
@@ -30,10 +29,12 @@ public final class ArchivedCassandraClusterClient implements Initializer,Finaliz
 	private static String archivedCassKeyspace = null;
 
 	public void initializeComponent(JsonObject config){
+		
 		archivedCassSeeds = config.getString("archived.cassandra.seeds");
 		archivedCassDatacenter = config.getString("archived.cassandra.datacenter");
 		archivedCassCluster = config.getString("archived.cassandra.cluster");
 		archivedCassKeyspace = config.getString("archived.cassandra.keyspace");
+		
 		LOG.info("archivedCassSeeds : {} - archivedCassKeyspace : {} ", archivedCassSeeds, archivedCassKeyspace);
 		ConnectionPoolConfigurationImpl poolConfig = new ConnectionPoolConfigurationImpl("MyConnectionPool")
 				.setPort(9160).setSeeds(archivedCassSeeds).setSocketTimeout(30000).setMaxTimeoutWhenExhausted(2000)
