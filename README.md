@@ -1,4 +1,4 @@
-# gooru-migration-scripts
+# nucleus-analytics-jobs
 This project contains all type of migration scripts.
 
 ## Prerequisites
@@ -16,4 +16,4 @@ Once the far Jar is created, it could be run as any other Java application.
 
 Following command could be used, from the base directory.
 
-> java -classpath build/libs/nucleus-analytics-jobs-fat.jar: org.gooru.analyics.jobs.infra.DeployJobs -conf analytics-jobs-config.json
+> java -classpath build/libs/nucleus-analytics-jobs-fat.jar: -Dvertx.metrics.options.enabled=true -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory io.vertx.core.Launcher -conf nucleus-analytics-jobs-config.json
