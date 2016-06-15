@@ -44,7 +44,7 @@ public final class Constants {
 	public static final String LAST_UPDATED_TIME = "last_updated_time";
 	public static final String CONTENT_AUTHORIZED_USERS = "content_authorized_users";
 	public static final String CLASS_MEMBERS = "class_members";
-	public static final String GET_CLASS_COURSE = "select distinct class.id,col.course_id,class.updated_at from class class inner join collection col on col.course_id = class.course_id where class.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
+	public static final String GET_CLASS_COURSE = "select distinct class.id,col.course_id,class.updated_at from class class inner join collection col on col.course_id = class.course_id where collection.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
 	public static final String GET_COURSE_COUNT = "select course_id as contentId, format, count(format) as totalCounts from collection where course_id = ? group by format,course_id;";
 	public static final String GET_UNIT_COUNT = "select unit_id as contentId, format, count(format) as totalCounts from collection where course_id = ? group by format,unit_id;";
 	public static final String GET_LESSON_COUNT = "select lesson_id as contentId, format, count(format) as totalCounts from collection where course_id = ? group by format,lesson_id;";
