@@ -1,5 +1,6 @@
 package org.gooru.analytics.jobs.infra;
 
+import org.gooru.analytics.jobs.constants.Constants;
 import org.gooru.analytics.jobs.infra.shutdown.Finalizer;
 import org.gooru.analytics.jobs.infra.startup.Initializer;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public final class EventCassandraClusterClient implements Initializer, Finalizer
     eventCassKeyspace = config.getString("event.cassandra.keyspace");
     LOG.info("eventCassSeeds : {} - eventCassKeyspace : {}", eventCassSeeds, eventCassKeyspace);
 
-    Cluster cluster = Cluster.builder().withClusterName(eventCassCluster).addContactPoint(eventCassSeeds).withRetryPolicy(DefaultRetryPolicy.INSTANCE)
+    Cluster cluster = Cluster.builder().withClusterName(eventCassCluster).addContactPoints(eventCassSeeds.split(Constants.COMMA)).withRetryPolicy(DefaultRetryPolicy.INSTANCE)
             .withReconnectionPolicy(new ExponentialReconnectionPolicy(1000, 30000)).build();
     session = cluster.connect(eventCassKeyspace);
     LOG.info("Event Cassandra Cluster Initialized successfully..");

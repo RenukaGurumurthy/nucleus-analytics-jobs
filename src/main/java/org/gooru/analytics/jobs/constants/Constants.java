@@ -1,7 +1,8 @@
 package org.gooru.analytics.jobs.constants;
 
 public final class Constants {
-	public static final String NA = "NA";
+  public static final String COMMA = ",";
+  public static final String NA = "NA";
 	public static final String FIELDS = "fields";
 	public static final String EVENT_TIMIELINE = "event_timeline";
 	public static final String EVENT_DETAIL = "event_detail";
