@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.gooru.analytics.jobs.executor.StatDataMigration;
 import org.gooru.analytics.jobs.executor.StatMetricsPublisher;
 import org.gooru.analytics.jobs.executor.SyncClassMembers;
 import org.gooru.analytics.jobs.executor.SyncContentAuthorizedUsers;
@@ -19,6 +20,7 @@ public class JobInitializers implements Iterable<JobInitializer> {
     initializers.add(SyncContentAuthorizedUsers.instance());
     initializers.add(SyncClassMembers.instance());
     initializers.add(StatMetricsPublisher.instance());
+    initializers.add(StatDataMigration.instance());
     internalIterator = initializers.iterator();
   }
 
