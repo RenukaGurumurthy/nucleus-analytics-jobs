@@ -95,9 +95,8 @@ public class StatDataMigration implements JobInitializer {
                 switch (statMetrics.getName()) {
                 case Constants.COUNT_VIEWS:
                   viewCount = statMetrics.getLongValue();
-                  // updateStatisticalCounterData(gooruOid,VIEWS,
-                  // viewCount);
-                  balanceCounterData(gooruOid, Constants.VIEWS, viewCount);
+                  updateStatisticalCounterData(gooruOid, Constants.VIEWS, viewCount);
+                  //balanceCounterData(gooruOid, Constants.VIEWS, viewCount);
                   break;
                 case Constants.TIME_SPENT_TOTAL:
                   // updateStatisticalCounterData(gooruOid,TOTAL_TIMESPENT_IN_MS,statMetrics.getLongValue());
@@ -105,15 +104,13 @@ public class StatDataMigration implements JobInitializer {
                   break;
                 case Constants.COUNT_COPY:
                   remixCount = statMetrics.getLongValue();
-                  // updateStatisticalCounterData(gooruOid,COPY,
-                  // remixCount);
-                  balanceCounterData(gooruOid, Constants.COPY, remixCount);
+                   updateStatisticalCounterData(gooruOid, Constants.COPY, remixCount);
+                  //balanceCounterData(gooruOid, Constants.COPY, remixCount);
                   break;
                 case Constants.COUNT_RESOURCE_ADDED_PUBLIC:
                   usedInCollectionCount = statMetrics.getLongValue();
-                  // updateStatisticalCounterData(gooruOid,COPY,
-                  // remixCount);
-                  balanceCounterData(gooruOid, Constants.USED_IN_COLLECTION_COUNT, usedInCollectionCount);
+                   updateStatisticalCounterData(gooruOid, Constants.USED_IN_COLLECTION_COUNT, usedInCollectionCount);
+                 // balanceCounterData(gooruOid, Constants.USED_IN_COLLECTION_COUNT, usedInCollectionCount);
                   break;
                 default:
                   LOG.info("Unused metric: " + statMetrics.getName());
@@ -123,7 +120,7 @@ public class StatDataMigration implements JobInitializer {
               /**
                * Generate content builder to write in search index.
                */
-              if (StringUtils.isNotBlank(gooruOid)) {
+              if (StringUtils.isNotBlank(gooruOid) && viewCount != 0 && remixCount != 0 && usedInCollectionCount != 0) {
                 XContentBuilder statistics = contentBuilder.startObject("statistics");
                 statistics.field(Constants.ID, gooruOid);
                 statistics.field(Constants.VIEWS_COUNT, viewCount);
