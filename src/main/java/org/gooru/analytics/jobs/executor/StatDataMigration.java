@@ -120,7 +120,7 @@ public class StatDataMigration implements JobInitializer {
               /**
                * Generate content builder to write in search index.
                */
-              if (StringUtils.isNotBlank(gooruOid) && viewCount != 0 && remixCount != 0 && usedInCollectionCount != 0) {
+              if (StringUtils.isNotBlank(gooruOid) && (viewCount != 0 || remixCount != 0 || usedInCollectionCount != 0)) {
                 XContentBuilder statistics = contentBuilder.startObject("statistics");
                 statistics.field(Constants.ID, gooruOid);
                 statistics.field(Constants.VIEWS_COUNT, viewCount);
@@ -133,7 +133,7 @@ public class StatDataMigration implements JobInitializer {
             }
             deleteFromPublisherQueue(Constants.MIGRATE_METRICS, gooruOid);
           }
-        } catch (IOException e) {
+        } catch (Exception e) {
           LOG.error("Error while migrating data.", e);
         }
         LOG.info("Job running at {}", new Date());
