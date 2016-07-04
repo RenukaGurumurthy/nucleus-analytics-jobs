@@ -43,6 +43,9 @@ public final class Constants {
 	public static final String PROPERTY_NAME = "property_name";
 	public static final String PROPERTY_VALUE = "property_value";
 	public static final String LAST_UPDATED_TIME = "last_updated_time";
+	public static final String STATUS = "status";
+	public static final String STOP = "stop";
+	public static final String START = "start";
 	public static final String CONTENT_AUTHORIZED_USERS = "content_authorized_users";
 	public static final String CLASS_MEMBERS = "class_members";
 	public static final String GET_CLASS_COURSE = "select distinct class.id,col.course_id,class.updated_at from class class inner join collection col on col.course_id = class.course_id where col.is_deleted = false and col.updated_at > to_timestamp(?,'YYYY-MM-DD HH24:MI:SS') - interval '3 minutes';";
