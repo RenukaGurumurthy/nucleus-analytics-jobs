@@ -77,7 +77,7 @@ public class EventMigration implements JobInitializer {
         }
         startDate = new Date(startDate).getTime() + 60000;
         Thread.sleep(200);
-        updateLastUpdatedTime(JOB_NAME, startDate.toString());
+        updateLastUpdatedTime(JOB_NAME, currentDate);
       }
       }else{
         LOG.info("Event migration job stopped!!");
