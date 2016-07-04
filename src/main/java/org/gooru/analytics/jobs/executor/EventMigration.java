@@ -146,7 +146,7 @@ public class EventMigration implements JobInitializer {
     } catch (Exception e) {
       LOG.error("Error while reading job last updated time.{}", e);
     }
-    return minuteDateFormatter.format(new Date());
+    return Constants.STOP;
   }
   private static void updateLastUpdatedTime(String jobName, String updatedTime) {
     try {
