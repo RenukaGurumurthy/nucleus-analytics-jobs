@@ -53,16 +53,16 @@ public class EventMigration implements JobInitializer {
       String status = getJobStatus();
       if(!Constants.STOP.equalsIgnoreCase(status)){
       //String start = "201508251405";
-      String end = "201508251405";
+    //  String end = "201508251405";
       String start = getLastUpdatedTime();
       
       Long startTime = minuteDateFormatter.parse(start).getTime();
       LOG.info("startTime : " + start);
-      Long endTime = minuteDateFormatter.parse(end).getTime();
-      LOG.info("endTime : " + end);
+      /*Long endTime = minuteDateFormatter.parse(end).getTime();
+      LOG.info("endTime : " + end);*/
       // String start = "201508251405";
-      // Long endTime = new Date().getTime();
-
+       Long endTime = new Date().getTime();
+       LOG.info("endTime : " + endTime);
       for (Long startDate = startTime; startDate < endTime;) {
         String currentDate = minuteDateFormatter.format(new Date(startDate));
         LOG.info("Running for :" + currentDate);
