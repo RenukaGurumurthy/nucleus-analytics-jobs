@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.gooru.analytics.jobs.constants.Constants;
 import org.gooru.analytics.jobs.infra.AnalyticsUsageCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.ArchievedCassandraClusterDataStax;
 import org.gooru.analytics.jobs.infra.ArchivedCassandraClusterClient;
 import org.gooru.analytics.jobs.infra.EventCassandraClusterClient;
 import org.gooru.analytics.jobs.infra.startup.JobInitializer;
@@ -18,9 +19,6 @@ import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.netflix.astyanax.model.ColumnList;
-import com.netflix.astyanax.model.ConsistencyLevel;
-import com.netflix.astyanax.retry.ConstantBackoff;
 
 import io.vertx.core.json.JsonObject;
 
@@ -29,6 +27,7 @@ public class EventMigration implements JobInitializer {
   private static final SimpleDateFormat minuteDateFormatter = new SimpleDateFormat("yyyyMMddkkmm");
   private static final EventCassandraClusterClient eventCassandraClusterClient = EventCassandraClusterClient.instance();
   private static final ArchivedCassandraClusterClient archivedCassandraClusterClient = ArchivedCassandraClusterClient.instance();
+  private static final ArchievedCassandraClusterDataStax archivedCassandraDataStax = ArchievedCassandraClusterDataStax.instance();
   private static final AnalyticsUsageCassandraClusterClient analyticsUsageCassandraClusterClient = AnalyticsUsageCassandraClusterClient.instance();
   private static final String JOB_NAME = "event_migration";
   private static final PreparedStatement insertEvents =
@@ -61,21 +60,20 @@ public class EventMigration implements JobInitializer {
           LOG.info("Running for :" + currentDate);
           // Incrementing time - one minute
           long s = System.currentTimeMillis();
-          ColumnList<String> et = readWithKey(Constants.EVENT_TIMIELINE, currentDate);
+          ResultSet et = readWithKey(Constants.EVENT_TIMIELINE, currentDate);
           long st = System.currentTimeMillis();
-          LOG.info("time to get data from event_timeline: " + (st-s));
-          for (String eventId : et.getColumnNames()) {
-            LOG.info("eventId: " + eventId);
-            long s1 = System.currentTimeMillis();
-            ColumnList<String> ef = readWithKey(Constants.EVENT_DETAIL, eventId);
-            long s2 = System.currentTimeMillis();
-            LOG.info("time to get data from event_detail: " + (s2-s1));
-            // Insert event_time_line
-            insertData(currentDate, et.getStringValue(eventId, Constants.NA), insertEventTimeLine);
-            // Insert events
-            insertData(eventId, ef.getStringValue(Constants.FIELDS, Constants.NA), insertEvents);
-            long s3 = System.currentTimeMillis();
-            LOG.info("time to write: " + (s3-s2));
+          LOG.info("time to get data from event_timeline: " + (st - s));
+          for (Row eventTimelineRow : et) {
+            String eventId = eventTimelineRow.getString("column1");
+            LOG.info("eventId:" + eventId);
+            ResultSet ef = readWithKey(Constants.EVENT_DETAIL, eventId);
+            for (Row eventDetailRow : ef) {
+              String fields = eventDetailRow.getString("fields");
+              // Insert event_time_line
+              insertData(currentDate, eventId, insertEventTimeLine);
+              // Insert events
+              insertData(eventId, fields, insertEvents);
+            }
           }
           startDate = new Date(startDate).getTime() + 60000;
           updateLastUpdatedTime(JOB_NAME, currentDate);
@@ -95,12 +93,15 @@ public class EventMigration implements JobInitializer {
 
   }
 
-  public static ColumnList<String> readWithKey(String cfName, String key) {
+  public static ResultSet readWithKey(String cfName, String key) {
 
-    ColumnList<String> result = null;
+    ResultSet result = null;
     try {
-      result = (archivedCassandraClusterClient.getCassandraKeyspace()).prepareQuery(archivedCassandraClusterClient.accessColumnFamily(cfName))
-              .setConsistencyLevel(ConsistencyLevel.CL_LOCAL_QUORUM).withRetryPolicy(new ConstantBackoff(2000, 5)).getKey(key).execute().getResult();
+
+      Statement stmt = QueryBuilder.select().all().from(cfName, archivedCassandraDataStax.getArchivedCassKeyspace())
+              .where(QueryBuilder.eq("key", key)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+
+      result = analyticsUsageCassandraClusterClient.getCassandraSession().execute(stmt);
 
     } catch (Exception e) {
       LOG.error("Failure in reading with key", e);
@@ -123,7 +124,8 @@ public class EventMigration implements JobInitializer {
     try {
       Statement select = QueryBuilder.select().all()
               .from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
-              .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+              .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME))
+              .setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(select);
       ResultSet result = resultSetFuture.get();
       for (Row r : result) {
@@ -139,7 +141,8 @@ public class EventMigration implements JobInitializer {
     try {
       Statement select =
               QueryBuilder.select().all().from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
-                      .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.STATUS)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+                      .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.STATUS))
+                      .setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(select);
       ResultSet result = resultSetFuture.get();
       for (Row r : result) {
@@ -153,9 +156,10 @@ public class EventMigration implements JobInitializer {
 
   private static void updateLastUpdatedTime(String jobName, String updatedTime) {
     try {
-      Statement insertStatmt = QueryBuilder.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
-              .value(Constants._JOB_NAME, jobName).value(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME)
-              .value(Constants.PROPERTY_VALUE, updatedTime).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+      Statement insertStatmt =
+              QueryBuilder.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
+                      .value(Constants._JOB_NAME, jobName).value(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME)
+                      .value(Constants.PROPERTY_VALUE, updatedTime).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
 
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(insertStatmt);
       resultSetFuture.get();
