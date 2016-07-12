@@ -99,8 +99,8 @@ public class EventMigration implements JobInitializer {
     try {
 
       Statement stmt = QueryBuilder.select().all().from(archivedCassandraDataStax.getArchivedCassKeyspace(),cfName)
-              .where(QueryBuilder.eq("key", key)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
-
+              .where(QueryBuilder.eq("key", key));
+      
       result = archivedCassandraDataStax.getCassandraSession().execute(stmt);
 
     } catch (Exception e) {
@@ -125,7 +125,7 @@ public class EventMigration implements JobInitializer {
       Statement select = QueryBuilder.select().all()
               .from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
               .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME))
-              .setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+              ;
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(select);
       ResultSet result = resultSetFuture.get();
       for (Row r : result) {
@@ -142,7 +142,7 @@ public class EventMigration implements JobInitializer {
       Statement select =
               QueryBuilder.select().all().from(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
                       .where(QueryBuilder.eq(Constants._JOB_NAME, JOB_NAME)).and(QueryBuilder.eq(Constants.PROPERTY_NAME, Constants.STATUS))
-                      .setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
+                      ;
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(select);
       ResultSet result = resultSetFuture.get();
       for (Row r : result) {
@@ -159,8 +159,7 @@ public class EventMigration implements JobInitializer {
       Statement insertStatmt =
               QueryBuilder.insertInto(analyticsUsageCassandraClusterClient.getAnalyticsCassKeyspace(), Constants.SYNC_JOBS_PROPERTIES)
                       .value(Constants._JOB_NAME, jobName).value(Constants.PROPERTY_NAME, Constants.LAST_UPDATED_TIME)
-                      .value(Constants.PROPERTY_VALUE, updatedTime).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
-
+                      .value(Constants.PROPERTY_VALUE, updatedTime);
       ResultSetFuture resultSetFuture = analyticsUsageCassandraClusterClient.getCassandraSession().executeAsync(insertStatmt);
       resultSetFuture.get();
     } catch (Exception e) {
