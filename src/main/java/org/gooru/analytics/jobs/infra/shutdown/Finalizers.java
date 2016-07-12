@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.gooru.analytics.jobs.infra.AnalyticsUsageCassandraClusterClient;
+import org.gooru.analytics.jobs.infra.ArchievedCassandraClusterDataStax;
 import org.gooru.analytics.jobs.infra.ArchivedCassandraClusterClient;
 import org.gooru.analytics.jobs.infra.ElasticsearchClusterClient;
 import org.gooru.analytics.jobs.infra.EventCassandraClusterClient;
@@ -23,6 +24,7 @@ public class Finalizers implements Iterable<Finalizer> {
     finalizers.add(KafkaClusterClient.instance());
     finalizers.add(ElasticsearchClusterClient.instance());
     finalizers.add(PostgreSQLConnection.instance());
+    finalizers.add(ArchievedCassandraClusterDataStax.instance());
     internalIterator = finalizers.iterator();
   }
 
