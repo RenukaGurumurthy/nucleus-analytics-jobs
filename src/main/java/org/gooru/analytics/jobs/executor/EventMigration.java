@@ -59,13 +59,9 @@ public class EventMigration implements JobInitializer {
           String currentDate = minuteDateFormatter.format(new Date(startDate));
           LOG.info("Running for :" + currentDate);
           // Incrementing time - one minute
-          long s = System.currentTimeMillis();
           ResultSet et = readWithKey(Constants.EVENT_TIMIELINE, currentDate);
-          long st = System.currentTimeMillis();
-          LOG.info("time to get data from event_timeline: " + (st - s));
           for (Row eventTimelineRow : et) {
             String eventId = eventTimelineRow.getString("column1");
-            LOG.info("eventId:" + eventId);
             ResultSet ef = readWithKey(Constants.EVENT_DETAIL, eventId);
             for (Row eventDetailRow : ef) {
               String fields = eventDetailRow.getString("fields");
