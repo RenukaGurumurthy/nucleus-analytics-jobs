@@ -101,7 +101,7 @@ public class EventMigration implements JobInitializer {
       Statement stmt = QueryBuilder.select().all().from(cfName, archivedCassandraDataStax.getArchivedCassKeyspace())
               .where(QueryBuilder.eq("key", key)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
 
-      result = analyticsUsageCassandraClusterClient.getCassandraSession().execute(stmt);
+      result = archivedCassandraDataStax.getCassandraSession().execute(stmt);
 
     } catch (Exception e) {
       LOG.error("Failure in reading with key", e);
