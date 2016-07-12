@@ -98,7 +98,7 @@ public class EventMigration implements JobInitializer {
     ResultSet result = null;
     try {
 
-      Statement stmt = QueryBuilder.select().all().from(cfName, archivedCassandraDataStax.getArchivedCassKeyspace())
+      Statement stmt = QueryBuilder.select().all().from(archivedCassandraDataStax.getArchivedCassKeyspace(),cfName)
               .where(QueryBuilder.eq("key", key)).setConsistencyLevel(com.datastax.driver.core.ConsistencyLevel.QUORUM);
 
       result = archivedCassandraDataStax.getCassandraSession().execute(stmt);
