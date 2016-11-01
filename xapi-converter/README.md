@@ -7,7 +7,7 @@ This migration job will convert all the Gooru events into xAPI format.
 - Java 8
 
 ## Running Build via Talend
-1. Open Talend Open Studion
+1. Open Talend Open Studio.
 2. Import this zip file as a exisiting project.
 3. Click Run icon.
 
