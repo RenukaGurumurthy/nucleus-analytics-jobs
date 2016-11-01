@@ -3,7 +3,7 @@ This migration job will convert all the Gooru events into xAPI format.
 
 ## Prerequisites
 
-- Apache Talend Open Studio
+- Talend Open Studio
 - Java 8
 
 ## Running Build via Talend
@@ -11,7 +11,7 @@ This migration job will convert all the Gooru events into xAPI format.
 2. Import this zip file as a exisiting project.
 3. Click Run icon.
 
-## Export As Standalone Project
+## Export As Standalone Project (Recommended method)
 1. Right click on project and click Build option. New window will open.
 2. Choose Standalone project and export.
 3. It will give shell script.
