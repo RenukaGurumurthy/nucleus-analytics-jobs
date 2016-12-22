@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.gooru.analytics.jobs.executor.EventMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,13 +11,13 @@ import com.datastax.driver.core.BoundStatement;
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.policies.DefaultRetryPolicy;
 import com.datastax.driver.core.policies.ExponentialReconnectionPolicy;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.hazelcast.util.StringUtil;
 
 public class UpdateMetrics {
 
@@ -50,22 +49,27 @@ public class UpdateMetrics {
         String collectionId = row[4];
         String userId = row[5];
 
-        ResultSet sessionIdSet = getSesstionIds(classId, courseId, unitId, lessonId, collectionId, userId);
-        long timespent = 0, views = 0;
-        for (Row sessionIdRow : sessionIdSet) {
-          ResultSet metricsSet = getSessionWiseMetrics(sessionIdRow.getString("session_id"), collectionId);
-          for (Row metricsRow : metricsSet) {
-            timespent += metricsRow.getLong("time_spent");
-            views += metricsRow.getLong("views");
+        if (!StringUtil.isNullOrEmpty(classId) && !StringUtil.isNullOrEmpty(courseId) && !StringUtil.isNullOrEmpty(unitId)
+                && !StringUtil.isNullOrEmpty(lessonId) && !StringUtil.isNullOrEmpty(collectionId) && !StringUtil.isNullOrEmpty(userId)) {
+          ResultSet sessionIdSet = getSesstionIds(classId, courseId, unitId, lessonId, collectionId, userId);
+          long timespent = 0, views = 0;
+          for (Row sessionIdRow : sessionIdSet) {
+            ResultSet metricsSet = getSessionWiseMetrics(sessionIdRow.getString("session_id"), collectionId);
+            for (Row metricsRow : metricsSet) {
+              timespent += metricsRow.getLong("time_spent");
+              views += metricsRow.getLong("views");
+            }
+          }
+          if (views > 0) {
+            if (!update(classId, courseId, unitId, lessonId, collectionId, userId, timespent, views)) {
+              LOG.info("Failed :::: classId:" + classId + "|courseId:" + courseId + "|unitId:" + unitId + "|lessonId:" + lessonId + "|collectionId:"
+                      + collectionId + "|userId:" + userId + "|views:" + views + "|timespent:" + timespent);
+            } else {
+              LOG.info("Success :::: classId:" + classId + "|courseId:" + courseId + "|unitId:" + unitId + "|lessonId:" + lessonId + "|collectionId:"
+                      + collectionId + "|userId:" + userId + "|views:" + views + "|timespent:" + timespent);
+            }
           }
         }
-
-        if (!update(classId, courseId, unitId, lessonId, collectionId, userId, timespent, views)) {
-          LOG.info("classId:" + classId + "|courseId:" + courseId + "|unitId:" + unitId + "|lessonId:" + lessonId + "|collectionId:" + collectionId
-                  + "|userId:" + userId + "|views:" + views + "|timespent:" + timespent);
-          LOG.error("Exception while updating students_class_activity...");
-        }
-
       }
 
     } catch (Exception e) {
@@ -87,8 +91,7 @@ public class UpdateMetrics {
               .and(QueryBuilder.eq("collection_uid", collectionId)).and(QueryBuilder.eq("collection_type", "assessment"))
               .and(QueryBuilder.eq("class_uid", classId)).and(QueryBuilder.eq("course_uid", courseId)).and(QueryBuilder.eq("unit_uid", unitId))
               .and(QueryBuilder.eq("lesson_uid", lessonId));
-      ResultSetFuture resultSetFuture = session.executeAsync(select);
-      ResultSet result = resultSetFuture.get();
+      ResultSet result = session.execute(select);
       return result;
     } catch (Exception e) {
       e.printStackTrace();
@@ -100,8 +103,7 @@ public class UpdateMetrics {
     try {
       Statement select = QueryBuilder.select().all().from("event_logger_insights", "user_session_activity")
               .where(QueryBuilder.eq("session_id", sessionId)).and(QueryBuilder.eq("gooru_oid", collectionId));
-      ResultSetFuture resultSetFuture = session.executeAsync(select);
-      ResultSet result = resultSetFuture.get();
+      ResultSet result = session.execute(select);
       return result;
     } catch (Exception e) {
       e.printStackTrace();
@@ -112,16 +114,16 @@ public class UpdateMetrics {
   public static boolean update(String classId, String courseId, String unitId, String lessonId, String collectionId, String userId, long timespent,
           long views) {
     try {
-      BoundStatement boundStatement = new BoundStatement(UPDATE_CLASS_ACTIVITY);
-      boundStatement.bind("time_spent", timespent);
-      boundStatement.bind("views", views);
-      boundStatement.bind("class_uid", classId);
-      boundStatement.bind("course_uid", courseId);
-      boundStatement.bind("unit_uid", unitId);
-      boundStatement.bind("lesson_uid", lessonId);
-      boundStatement.bind("collection_uid", collectionId);
-      boundStatement.bind("user_uid", userId);
-      (session).executeAsync(boundStatement);
+      BoundStatement boundStatement = UPDATE_CLASS_ACTIVITY.bind();
+      boundStatement.setLong("time_spent", timespent);
+      boundStatement.setLong("views", views);
+      boundStatement.setString("class_uid", classId);
+      boundStatement.setString("course_uid", courseId);
+      boundStatement.setString("unit_uid", unitId);
+      boundStatement.setString("lesson_uid", lessonId);
+      boundStatement.setString("collection_uid", collectionId);
+      boundStatement.setString("user_uid", userId);
+      (session).execute(boundStatement);
       return true;
     } catch (Exception e) {
       e.printStackTrace();
