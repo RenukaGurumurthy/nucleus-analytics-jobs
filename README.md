@@ -8,7 +8,7 @@ This project contains all type of migration scripts.
 
 ## Running Build
 
-The default task is *shadowJar* which is provided by plugin. So running *gradle* from command line will run *shadowJar* and it will create a fat jar in build/libs folder. Note that there is artifact name specified in build file and hence it will take the name from directory housing the project.
+The default task is *shadowJar* which is provided by plugin. So running *gradle build* from command line will run *shadowJar* and it will create a fat jar in build/libs folder. Note that there is artifact name specified in build file and hence it will take the name from directory housing the project.
 
 Once the far Jar is created, it could be run as any other Java application.
 
