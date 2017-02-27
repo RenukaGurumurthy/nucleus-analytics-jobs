@@ -32,7 +32,7 @@ public final class TransactionExecutor {
   public static Object executeWithCoreDBTransaction(DBHandler handler) {
     Object result = null;
     try {
-      Base.open(DataSourceRegistry.getInstance().getAnalyticsDataSource());
+      Base.open(DataSourceRegistry.getInstance().getCoreDataSource());
       Base.openTransaction();
      result =  handler.execute();
       Base.commitTransaction();
