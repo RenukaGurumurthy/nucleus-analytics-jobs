@@ -28,9 +28,9 @@ public class ProcessItemCopy {
   public void execute() {
     LOGGER.debug("Process Copy Event : {} " + event);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
-    JSONObject source = payLoad.getJSONObject("source");
-    JSONObject target = payLoad.getJSONObject("target");
-    JSONObject context = payLoad.getJSONObject("context");
+    JSONObject source = payLoad.isNull("source") ? null : payLoad.getJSONObject("source");
+    JSONObject target = payLoad.isNull("target") ? null : payLoad.getJSONObject("target");
+    JSONObject context = event.isNull("context") ? null : event.getJSONObject("context");
 
     LOGGER.debug("context : {}", context);
     LOGGER.debug("source : {}", source);
@@ -43,8 +43,12 @@ public class ProcessItemCopy {
       this.totalCount = (List<Map>) TransactionExecutor.executeWithCoreDBTransaction(new DBHandler() {
         @Override
         public Object execute() {
-          return getCoreDBCollectionCount(target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
-                  target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID), target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID), contentFormat);
+          return getCoreDBCollectionCount(
+                  target.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
+                  context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID),
+                  contentFormat);
         }
       });
 
@@ -55,9 +59,12 @@ public class ProcessItemCopy {
       public Object execute() {
 
         if (target != null) {
-          updateCourseCollectionCount(target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
-                  target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID), target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
-                  context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID), payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
+          updateCourseCollectionCount(
+                  target.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
+                  context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID),
+                  payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
         }
         LOGGER.info("DONE");
         return null;
@@ -75,13 +82,13 @@ public class ProcessItemCopy {
     switch (contentFormat) {
     // `-1` indicates decrement 1 from existing value.
     case AttributeConstants.ATTR_COLLECTION:
-      //Do nothing. it will be handled in item.move event.
+      // Do nothing. it will be handled in item.move event.
       break;
     case AttributeConstants.ATTR_ASSESSMENT:
-      //Do nothing. it will be handled in item.move event.
+      // Do nothing. it will be handled in item.move event.
       break;
     case AttributeConstants.ATTR_EXTERNAL_ASSESSMENT:
-      //Do nothing. it will be handled in item.move event.
+      // Do nothing. it will be handled in item.move event.
       break;
     case AttributeConstants.ATTR_COURSE:
       try {
@@ -122,7 +129,7 @@ public class ProcessItemCopy {
     }
   }
 
-  private List<Map> getCoreDBCollectionCount(String courseId, String unitId, String lessonId,String leastContentId, String contentFormat) {
+  private List<Map> getCoreDBCollectionCount(String courseId, String unitId, String lessonId, String leastContentId, String contentFormat) {
     List<Map> totalCount = null;
     switch (contentFormat) {
     case AttributeConstants.ATTR_COURSE:

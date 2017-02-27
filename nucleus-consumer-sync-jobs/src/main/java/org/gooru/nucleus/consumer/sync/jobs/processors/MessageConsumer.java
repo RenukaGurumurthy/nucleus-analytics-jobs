@@ -48,10 +48,15 @@ public class MessageConsumer implements Runnable {
       JSONObject eventObject = null;
       try {
         eventObject = new JSONObject(record);
-        final String eventName = eventObject.getString(AttributeConstants.ATTR_EVENT_NAME);
-        CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
       } catch (Exception e) {
-        LOGGER.error("Unable to parse kafka message. It should be JSONObject");
+        LOGGER.error("Unable to parse kafka message. It should be JSONObject", e);
+      }
+      final String eventName = eventObject.getString(AttributeConstants.ATTR_EVENT_NAME);
+      LOGGER.debug("eventName {} ", eventName);
+      try{
+      CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
+      }catch (Exception e) {
+       e.printStackTrace();
       }
     }
   }

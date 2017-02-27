@@ -28,9 +28,9 @@ public class ProcessItemMove {
   @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
   public void execute() {
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
-    JSONObject source = payLoad.getJSONObject("source");
-    JSONObject target = payLoad.getJSONObject("target");
-    JSONObject context = payLoad.getJSONObject("context");
+    JSONObject source = payLoad.isNull("source") ? null : payLoad.getJSONObject("source");
+    JSONObject target = payLoad.isNull("target") ? null : payLoad.getJSONObject("target");
+    JSONObject context = event.isNull("context") ? null : event.getJSONObject("context");
 
     LOGGER.debug("context : {}", context);
     LOGGER.debug("source : {}", source);
@@ -43,9 +43,12 @@ public class ProcessItemMove {
       this.totalCount = (List<Map>) TransactionExecutor.executeWithCoreDBTransaction(new DBHandler() {
         @Override
         public Object execute() {
-          return getCoreDBCollectionCount(target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
-                  target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID), target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
-                  context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID), contentFormat);
+          return getCoreDBCollectionCount(
+                  target.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
+                  context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID),
+                  contentFormat);
         }
       });
 
@@ -55,14 +58,20 @@ public class ProcessItemMove {
       @Override
       public Object execute() {
         if (source != null) {
-          deleteCourseCollectionCount(source.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
-                  source.getString(AttributeConstants.ATTR_UNIT_GOORU_ID), source.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
-                  source.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID), payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
+          deleteCourseCollectionCount(
+                  source.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : source.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
+                  source.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : source.getString(AttributeConstants.ATTR_UNIT_GOORU_ID),
+                  source.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : source.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
+                  source.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : source.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID),
+                  payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
         }
         if (target != null) {
-          updateCourseCollectionCount(target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
-                  target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID), target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
-                  context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID), payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
+          updateCourseCollectionCount(
+                  target.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_UNIT_GOORU_ID),
+                  target.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_LESSON_GOORU_ID),
+                  context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID),
+                  payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT));
         }
         LOGGER.info("DONE");
         return null;
@@ -75,13 +84,13 @@ public class ProcessItemMove {
     switch (contentFormat) {
     // `-1` indicates decrement 1 from existing value.
     case AttributeConstants.ATTR_COLLECTION:
-      // Do nothing. Will handled in updateCourseCollectionCount method.
+      Base.exec(QueryConstants.UPDATE_COLLECTION_COUNT, -1, courseId, unitId, lessonId);
       break;
     case AttributeConstants.ATTR_ASSESSMENT:
-      // Do nothing. Will handled in updateCourseCollectionCount method.
+      Base.exec(QueryConstants.UPDATE_ASSESSMENT_COUNT, -1, courseId, unitId, lessonId);
       break;
     case AttributeConstants.ATTR_EXTERNAL_ASSESSMENT:
-      // Do nothing. Will handled in updateCourseCollectionCount method.
+      Base.exec(QueryConstants.UPDATE_EXT_ASSESSMENT_COUNT, -1, courseId, unitId, lessonId);
       break;
     case AttributeConstants.ATTR_COURSE:
       Base.exec(QueryConstants.DELETE_COURSE_LEVEL, leastContentId);
@@ -98,16 +107,32 @@ public class ProcessItemMove {
   }
 
   private void updateCourseCollectionCount(String courseId, String unitId, String lessonId, String leastContentId, String contentFormat) {
+    boolean rowExist = false;
+    Object rowCount = Base.firstCell(QueryConstants.SELECT_ROW_COUNT, courseId, unitId, lessonId);
+    if (Integer.valueOf(rowCount.toString()) > 0) {
+      rowExist = true;
+    }
     switch (contentFormat) {
-    // `-1` indicates decrement 1 from existing value.
     case AttributeConstants.ATTR_COLLECTION:
-      Base.exec(QueryConstants.UPDATE_COLLECTION_COUNT, -1, courseId, unitId, lessonId);
+      if (!rowExist) {
+        Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 1, 0, 0);
+      } else {
+        Base.exec(QueryConstants.UPDATE_COLLECTION_COUNT, 1, courseId, unitId, lessonId);
+      }
       break;
     case AttributeConstants.ATTR_ASSESSMENT:
-      Base.exec(QueryConstants.UPDATE_ASSESSMENT_COUNT, -1, courseId, unitId, lessonId);
+      if (!rowExist) {
+        Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 0, 1, 0);
+      } else {
+        Base.exec(QueryConstants.UPDATE_ASSESSMENT_COUNT, 1, courseId, unitId, lessonId);
+      }
       break;
     case AttributeConstants.ATTR_EXTERNAL_ASSESSMENT:
-      Base.exec(QueryConstants.UPDATE_EXT_ASSESSMENT_COUNT, -1, courseId, unitId, lessonId);
+      if (!rowExist) {
+        Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 0, 0, 1);
+      } else {
+        Base.exec(QueryConstants.UPDATE_EXT_ASSESSMENT_COUNT, 1, courseId, unitId, lessonId);
+      }
       break;
     case AttributeConstants.ATTR_COURSE:
       try {
