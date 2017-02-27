@@ -38,4 +38,17 @@ public class AttributeConstants {
   
   public static final  String ATTR_GOORUID = "gooruUId" ;
 
+  public static final  String ATTR_COURSE_ID = "course_id" ;
+
+  public static final  String ATTR_UNIT_ID = "unit_id" ;
+
+  public static final  String ATTR_LESSON_ID = "lesson_id" ;
+
+  public static final  String ATTR_COLLECTION_COUNT = "collection_count" ;
+
+  public static final  String ATTR_ASSESSMENT_COUNT = "assessment_count" ;
+
+  public static final  String ATTR_EXT_ASSESSMENT_COUNT = "ext_assessment_count" ;
+
+
 }
