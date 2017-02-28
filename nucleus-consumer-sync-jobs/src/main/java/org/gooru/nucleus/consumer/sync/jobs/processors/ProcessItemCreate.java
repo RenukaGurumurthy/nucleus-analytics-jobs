@@ -35,18 +35,10 @@ public class ProcessItemCreate {
     LOGGER.debug("contentFormat : {}", contentFormat);
     LOGGER.debug("userId : {}", userId);
 
-    TransactionExecutor.executeWithCoreDBTransaction(new DBHandler() {
-      @Override
-      public Object execute() {
-        if (contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS))
-          user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISIST, contentGooruId, userId);
-        return null;
-      }
-    });
-
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
+        user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISIST, contentGooruId, userId);
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
