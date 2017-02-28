@@ -122,7 +122,7 @@ public class ProcessItemCopy {
       totalCount.forEach(r -> {
         Base.addBatch(ps, r.get(AttributeConstants.ATTR_COURSE_ID), r.get(AttributeConstants.ATTR_UNIT_ID), r.get(AttributeConstants.ATTR_LESSON_ID),
                 r.get(AttributeConstants.ATTR_COLLECTION_COUNT), r.get(AttributeConstants.ATTR_ASSESSMENT_COUNT),
-                r.get(AttributeConstants.ATTR_ASSESSMENT_COUNT));
+                r.get(AttributeConstants.ATTR_EXT_ASSESSMENT_COUNT));
       });
       Base.executeBatch(ps);
       ps.close();
