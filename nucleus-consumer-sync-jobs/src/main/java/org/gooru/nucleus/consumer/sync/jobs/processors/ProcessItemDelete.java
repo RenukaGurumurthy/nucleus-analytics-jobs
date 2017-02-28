@@ -26,6 +26,7 @@ public class ProcessItemDelete {
       public Object execute() {
         JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
         JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
+        String classId = context.isNull(AttributeConstants.ATTR_CLASS_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CLASS_GOORU_ID);
         String lessonId = context.isNull(AttributeConstants.ATTR_LESSON_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_LESSON_GOORU_ID);
         String unitId = context.isNull(AttributeConstants.ATTR_UNIT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_UNIT_GOORU_ID);
         String courseId = context.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_COURSE_GOORU_ID);
@@ -39,7 +40,10 @@ public class ProcessItemDelete {
         LOGGER.debug("contentGooruId : {}", leastContentId);
         LOGGER.debug("contentFormat : {}", contentFormat);
         updateCourseCollectionCount(courseId, unitId, lessonId, leastContentId, contentFormat);
-        LOGGER.info("DONE");
+        LOGGER.info("updateCourseCollectionCount DONE");
+        if (classId != null) {
+          reCompute(classId, leastContentId, contentFormat);
+        }
         return null;
       }
     });
@@ -72,4 +76,33 @@ public class ProcessItemDelete {
     }
   }
 
+  private void reCompute(String classId, String leastContentId, String contentFormat) {
+    String query = null;
+    switch (contentFormat) {
+    case AttributeConstants.ATTR_COURSE:
+      query = QueryConstants.DELETE_BASEREPORT_BY_COURSE;
+      break;
+    case AttributeConstants.ATTR_UNIT:
+      query = QueryConstants.DELETE_BASEREPORT_BY_UNIT;
+      break;
+    case AttributeConstants.ATTR_LESSON:
+      query = QueryConstants.DELETE_BASEREPORT_BY_LESSON;
+      break;
+    case AttributeConstants.ATTR_COLLECTION:
+      query = QueryConstants.DELETE_BASEREPORT_BY_COLLECTION;
+      break;
+    case AttributeConstants.ATTR_ASSESSMENT:
+      query = QueryConstants.DELETE_BASEREPORT_BY_COLLECTION;
+      break;
+    default:
+      LOGGER.info("Invalid content format..");
+    }
+    if (query != null) {
+      Base.exec(query, classId, leastContentId);
+    } else {
+      LOGGER.warn("Nothing to process");
+    }
+    LOGGER.debug("Deleted record for class : {} - contentFormat : {} - content : {} ", classId, contentFormat, leastContentId);
+
+  }
 }

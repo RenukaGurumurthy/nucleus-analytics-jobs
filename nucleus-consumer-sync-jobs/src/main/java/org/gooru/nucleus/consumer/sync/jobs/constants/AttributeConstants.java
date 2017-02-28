@@ -22,6 +22,8 @@ public class AttributeConstants {
 
   public static final String ATTR_COLLECTION = "collection";
 
+  public static final String ATTR_CLASS = "class";
+
   public static final String ATTR_COURSE = "course";
 
   public static final String ATTR_UNIT = "unit";
@@ -49,6 +51,11 @@ public class AttributeConstants {
   public static final  String ATTR_ASSESSMENT_COUNT = "assessment_count" ;
 
   public static final  String ATTR_EXT_ASSESSMENT_COUNT = "ext_assessment_count" ;
+  
+  public static final  String USER = "user";
+  
+  public static final  String GOORUID = "gooruUId" ;
+
 
 
 }
