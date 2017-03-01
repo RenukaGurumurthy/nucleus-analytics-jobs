@@ -25,7 +25,7 @@ public class ProcessItemMove {
     this.event = event;
   }
 
-  @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void execute() {
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject source = payLoad.isNull("source") ? null : payLoad.getJSONObject("source");
@@ -113,6 +113,7 @@ public class ProcessItemMove {
       rowExist = true;
     }
     switch (contentFormat) {
+    
     case AttributeConstants.ATTR_COLLECTION:
       if (!rowExist) {
         Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 1, 0, 0);
@@ -120,6 +121,7 @@ public class ProcessItemMove {
         Base.exec(QueryConstants.UPDATE_COLLECTION_COUNT, 1, courseId, unitId, lessonId);
       }
       break;
+    
     case AttributeConstants.ATTR_ASSESSMENT:
       if (!rowExist) {
         Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 0, 1, 0);
@@ -127,6 +129,7 @@ public class ProcessItemMove {
         Base.exec(QueryConstants.UPDATE_ASSESSMENT_COUNT, 1, courseId, unitId, lessonId);
       }
       break;
+      
     case AttributeConstants.ATTR_EXTERNAL_ASSESSMENT:
       if (!rowExist) {
         Base.exec(QueryConstants.INSERT_COURSE_COLLECTION_COUNT, courseId, unitId, lessonId, 0, 0, 1);
@@ -134,20 +137,9 @@ public class ProcessItemMove {
         Base.exec(QueryConstants.UPDATE_EXT_ASSESSMENT_COUNT, 1, courseId, unitId, lessonId);
       }
       break;
+      
     case AttributeConstants.ATTR_COURSE:
-      try {
-        insertBatchData();
-      } catch (SQLException e) {
-        LOGGER.error(e.getMessage());
-      }
-      break;
     case AttributeConstants.ATTR_UNIT:
-      try {
-        insertBatchData();
-      } catch (SQLException e) {
-        LOGGER.error(e.getMessage());
-      }
-      break;
     case AttributeConstants.ATTR_LESSON:
       try {
         insertBatchData();

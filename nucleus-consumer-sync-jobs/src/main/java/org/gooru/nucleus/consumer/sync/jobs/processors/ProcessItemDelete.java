@@ -20,7 +20,7 @@ public class ProcessItemDelete {
   }
 
   public void execute() {
-    LOGGER.debug("Event : {}", event);
+    LOGGER.debug("Proces Delete Event : {}", event);
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
