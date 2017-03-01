@@ -57,7 +57,6 @@ public class ProcessItemCopy {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-
         if (target != null) {
           updateCourseCollectionCount(
                   target.isNull(AttributeConstants.ATTR_COURSE_GOORU_ID) ? null : target.getString(AttributeConstants.ATTR_COURSE_GOORU_ID),
@@ -74,36 +73,14 @@ public class ProcessItemCopy {
   }
 
   private void updateCourseCollectionCount(String courseId, String unitId, String lessonId, String leastContentId, String contentFormat) {
-    boolean rowExist = false;
-    Object rowCount = Base.firstCell(QueryConstants.SELECT_ROW_COUNT, courseId, unitId, lessonId);
-    if (Integer.valueOf(rowCount.toString()) > 0) {
-      rowExist = true;
-    }
     switch (contentFormat) {
-    // `-1` indicates decrement 1 from existing value.
     case AttributeConstants.ATTR_COLLECTION:
-      // Do nothing. it will be handled in item.move event.
-      break;
     case AttributeConstants.ATTR_ASSESSMENT:
-      // Do nothing. it will be handled in item.move event.
-      break;
     case AttributeConstants.ATTR_EXTERNAL_ASSESSMENT:
       // Do nothing. it will be handled in item.move event.
       break;
     case AttributeConstants.ATTR_COURSE:
-      try {
-        insertBatchData();
-      } catch (SQLException e) {
-        LOGGER.error(e.getMessage());
-      }
-      break;
     case AttributeConstants.ATTR_UNIT:
-      try {
-        insertBatchData();
-      } catch (SQLException e) {
-        LOGGER.error(e.getMessage());
-      }
-      break;
     case AttributeConstants.ATTR_LESSON:
       try {
         insertBatchData();

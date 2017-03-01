@@ -53,10 +53,10 @@ public class MessageConsumer implements Runnable {
       }
       final String eventName = eventObject.getString(AttributeConstants.ATTR_EVENT_NAME);
       LOGGER.debug("eventName {} ", eventName);
-      try{
-      CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
-      }catch (Exception e) {
-       e.printStackTrace();
+      try {
+        CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
+      } catch (Exception e) {
+        LOGGER.error("Error while processing event", e);
       }
     }
   }
