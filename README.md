@@ -17,3 +17,4 @@ Once the far Jar is created, it could be run as any other Java application.
 Following command could be used, from the base directory.
 
 > java -cp nucleus-consumer-sync-jobs/build/libs/nucleus-consumer-sync-jobs-0.1-snapshot-fat.jar: org.gooru.nucleus.consumer.sync.jobs.JobInitializer nucleus-consumer-sync-jobs/src/main/resources/nucleus-consumer-sync-jobs-config.json
+Since we implemented Kafka consumer to consume messages, Need not to form cluster. Please make sure correct Kafka topic and group ID. If you want to deploy same handlers multiple time to handle the request traffic, group ID should be same. So that it will be act as loadbalancer.
