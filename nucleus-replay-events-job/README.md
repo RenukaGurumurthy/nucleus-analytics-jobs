@@ -6,7 +6,7 @@ This job is to process older events
 - Copy the log files in preffered location. 
 - Log files should be in .csv format. Refer the sample file (sample_logapi_log.csv).
 - Property files will be available in this location (PostEvents/learning/postevents_0_1/contexts/). You can modify the configuration here.
-- Sample files can be generated following two commands in old logapi server.
+- Log files can be created following two commands from old logapi server tomcat logs.
 - Go to tomcat's event logs location (/opt/tomcat/event_api_logs).
 
 > zgrep "Field :" *.gz | sed 's/.*Field\ \:\ //' | grep "collection.play\|collection.resource.play" 
