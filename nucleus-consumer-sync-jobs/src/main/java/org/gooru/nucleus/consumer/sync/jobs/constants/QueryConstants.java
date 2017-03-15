@@ -28,13 +28,13 @@ public class QueryConstants {
 
   /*************************** DELETE Queries For ReComputations Purpose *************************/
   
-  public static final String DELETE_BASEREPORT_BY_COURSE = "DELETE FROM BaseReports WHERE classId = ? AND courseId = ?";
+  public static final String DELETE_BASEREPORT_BY_COURSE = "DELETE FROM base_reports WHERE class_id = ? AND course_id = ?";
  
-  public static final String DELETE_BASEREPORT_BY_UNIT = "DELETE FROM BaseReports WHERE classId = ? AND unitId = ?";
+  public static final String DELETE_BASEREPORT_BY_UNIT = "DELETE FROM base_reports WHERE class_id = ? AND course_id = ?";
   
-  public static final String DELETE_BASEREPORT_BY_LESSON = "DELETE FROM BaseReports WHERE classId = ? AND lessonId = ?";
+  public static final String DELETE_BASEREPORT_BY_LESSON = "DELETE FROM base_reports WHERE class_id = ? AND lesson_id = ?";
   
-  public static final String DELETE_BASEREPORT_BY_COLLECTION = "DELETE FROM BaseReports WHERE classId = ? AND collectionId = ?";
+  public static final String DELETE_BASEREPORT_BY_COLLECTION = "DELETE FROM base_reports WHERE class_id = ? AND collection_id = ?";
   
   /**********************************************************************************************/
   
