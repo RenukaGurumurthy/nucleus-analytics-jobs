@@ -45,5 +45,12 @@ public class QueryConstants {
   public static final String UPDATE_AUTHORIZED_USER = "UPDATE class_authorized_users SET creator_id = ? WHERE class_id = ? ";
  
   /**********************************************************************************************/
+  
+  /*************************** Content update **************************************************/
+
+  public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title)VALUES(?,?,?)";
+  public static final String UPDATE_CONTENT = "UPDATE content SET title = ? WHERE id = ? ";
+ 
+  /**********************************************************************************************/
 
 }

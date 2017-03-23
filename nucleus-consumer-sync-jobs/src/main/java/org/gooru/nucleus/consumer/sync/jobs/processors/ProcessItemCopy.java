@@ -26,7 +26,7 @@ public class ProcessItemCopy {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public void execute() {
-    LOGGER.debug("Process Copy Event : {} " + event);
+    LOGGER.debug("Processing Copy Event : {} " + event);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject source = payLoad.isNull("source") ? null : payLoad.getJSONObject("source");
     JSONObject target = payLoad.isNull("target") ? null : payLoad.getJSONObject("target");

@@ -23,7 +23,7 @@ public class ProcessItemCreate {
   }
 
   public void execute() {
-    System.out.println("Process Delete Event : {} " + event);
+    System.out.println("Processing Create Event : {} " + event);
     JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject userObject = event.getJSONObject(AttributeConstants.USER);
@@ -42,6 +42,9 @@ public class ProcessItemCreate {
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
+        if (user != null && contentFormat != null) {
+          updateContentTable(contentGooruId, contentFormat, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE));
+        }
         return null;
       }
     });
@@ -55,6 +58,17 @@ public class ProcessItemCreate {
       LOGGER.debug("Class authorized data inserted successfully...");
     } else {
       LOGGER.debug("User already present. Do nothing...");
+    }
+
+  }
+
+  private void updateContentTable(String contentGooruId, String contentFormat, String title) {
+    if (title != null) {
+      LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, contentFormat);
+      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title);
+      LOGGER.debug("Content inserted successfully...");
+    } else {
+      LOGGER.debug("Title can not be null...");
     }
 
   }
