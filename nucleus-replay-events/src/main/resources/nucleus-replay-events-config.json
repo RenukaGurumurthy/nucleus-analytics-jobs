@@ -1,0 +1,8 @@
+{
+"cassandra":{
+ "hosts" : "localhost",
+ "keyspace" : "event_logger_insights",
+ "cluster" : "Test Cluster"
+},
+"api.end.point":"http://nile-dev.gooru.org/api/nucleus-insights/v2/event?apiKey=33b9ad34-1a0c-43ba-bb9c-4784abe07110"
+}
