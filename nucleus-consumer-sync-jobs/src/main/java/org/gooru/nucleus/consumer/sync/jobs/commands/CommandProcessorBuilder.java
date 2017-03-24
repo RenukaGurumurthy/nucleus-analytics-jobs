@@ -41,6 +41,12 @@ public enum CommandProcessorBuilder {
     public void build(JSONObject event) {
       CommandProcessorFactory.ItemCreate(event);
     }
+  },
+  ITEM_UPDATE(CommandConstants.ITEM_UPDATE) {
+    @Override
+    public void build(JSONObject event) {
+      CommandProcessorFactory.ItemUpdate(event);
+    }
   };
 
   private String name;

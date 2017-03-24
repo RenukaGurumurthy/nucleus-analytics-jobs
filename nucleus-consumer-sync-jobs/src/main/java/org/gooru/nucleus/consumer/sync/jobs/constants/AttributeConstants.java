@@ -55,7 +55,9 @@ public class AttributeConstants {
   public static final  String USER = "user";
   
   public static final  String GOORUID = "gooruUId" ;
+  
+  public static final  String DATA = "data" ;
 
-
+  public static final  String TITLE = "title" ;
 
 }

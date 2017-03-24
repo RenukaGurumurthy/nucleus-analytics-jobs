@@ -10,4 +10,6 @@ public final class CommandConstants {
 
   public static final String ITEM_MOVE = "item.move";
 
+  public static final String ITEM_UPDATE = "item.update";
+
 }
