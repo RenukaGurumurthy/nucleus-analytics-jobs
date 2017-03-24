@@ -63,34 +63,55 @@ public class JobInitializer {
         for (Long startDate = startTime; startDate < endTime;) {
           String currentDate = minuteDateFormatter.format(new Date(startDate));
           LOGGER.info("Running for :" + currentDate);
-          ResultSet eventIds = findEventIdsByTime(currentDate);
-          for (Row eventId : eventIds) {
-            ResultSet events = findEventById(eventId.getString(AttributeConstants.EVENT_ID));
-            for (Row event : events) {
-              String eventData = event.getString(AttributeConstants.FIELDS);
-              // LOGGER.info("Event : " + "[" + eventData + "]");
-              int status = postRequest("[" + eventData + "]");
-              LOGGER.info("Status:" + status);
-              if (status != 200) {
-                LOGGER.warn("Retrying request.....");
-                Thread.sleep(1000);
-                int retryStatus = postRequest("[" + eventData + "]");
-                LOGGER.info("retryStatus:" + retryStatus);
+          ResultSet eventIds = null;
+          try {
+            eventIds = findEventIdsByTime(currentDate);
+          } catch (Exception e) {
+            // FIXME:Today we can skip this exception. We need to look at it in
+            // future.
+            LOGGER.error("Unexpected Exception while getting eventIDs. Can't do anything here.." + e);
+          }
+          if (eventIds != null) {
+            for (Row eventId : eventIds) {
+              ResultSet events = null;
+              try {
+                events = findEventById(eventId.getString(AttributeConstants.EVENT_ID));
+              } catch (Exception e) {
+                // FIXME:Today we can skip this exception. We need to look at
+                // it in future.
+                LOGGER.error("Unexpected exception while getting event. Can't do anything here.." + e);
+              }
+              if (events != null) {
+                for (Row event : events) {
+                  String eventData = event.getString(AttributeConstants.FIELDS);
+                  // LOGGER.info("Event : " + "[" + eventData + "]");
+                  int status = postRequest("[" + eventData + "]");
+                  LOGGER.info("Status:" + status);
+                  if (status != 200) {
+                    LOGGER.warn("Retrying request.....");
+                    Thread.sleep(1000);
+                    int retryStatus = postRequest("[" + eventData + "]");
+                    LOGGER.info("retryStatus:" + retryStatus);
 
+                  }
+                }
               }
             }
-
           }
+
           // Incrementing time - one minute
           startDate = new Date(startDate).getTime() + 60000;
           Thread.sleep(200);
         }
-        LOGGER.info("Process DONE");
+        LOGGER.info("Process DONE. Closing job...");
+        System.exit(0);
       } else {
         LOGGER.error("Configs can not be empty");
         System.exit(0);
       }
-    } else {
+    } else
+
+    {
       LOGGER.error("Config file location is required");
       System.exit(0);
     }
