@@ -54,7 +54,7 @@ public class ProcessItemCreate {
   private void updateClassAuthorizedTable(String contentGooruId, String userId) {
     if (user.isEmpty()) {
       LOGGER.debug("classId : {} - userId : {}", contentGooruId, userId);
-      Base.exec(QueryConstants.INSERT_AUTHORIZED_USER, contentGooruId, userId);
+      Base.exec(QueryConstants.INSERT_AUTHORIZED_USER, contentGooruId, userId,"creator");
       LOGGER.debug("Class authorized data inserted successfully...");
     } else {
       LOGGER.debug("User already present. Do nothing...");
