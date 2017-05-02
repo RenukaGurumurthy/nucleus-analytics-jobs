@@ -19,7 +19,7 @@ public class ProcessItemUpdate {
   }
 
   public void execute() {
-    System.out.println("Processing Update Event : {} " + event);
+    LOGGER.debug("Processing Update Event : {} " + event);
     JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     String contentGooruId =
@@ -32,7 +32,7 @@ public class ProcessItemUpdate {
       @Override
       public Object execute() {
         if (contentGooruId != null && contentFormat != null) {
-          updateContentTable(contentGooruId, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE));
+          updateContentTable(contentGooruId, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE),payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.SUBJECT_BUCKET));
         }
         return null;
       }
@@ -40,10 +40,10 @@ public class ProcessItemUpdate {
     LOGGER.debug("DONE");
   }
 
-  private void updateContentTable(String contentGooruId, String title) {
+  private void updateContentTable(String contentGooruId, String title, String taxSubjectId) {
     if (title != null) {
       LOGGER.debug("contentGooruId : {} - title : {} ", contentGooruId, title);
-      Base.exec(QueryConstants.UPDATE_CONTENT, title, contentGooruId);
+      Base.exec(QueryConstants.UPDATE_CONTENT, title, taxSubjectId, contentGooruId);
       LOGGER.debug("Content updated successfully...");
     } else {
       LOGGER.debug("Title can not be null...");
