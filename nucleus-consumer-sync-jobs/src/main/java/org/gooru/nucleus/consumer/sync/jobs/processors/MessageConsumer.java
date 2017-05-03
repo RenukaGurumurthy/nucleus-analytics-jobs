@@ -34,7 +34,7 @@ public class MessageConsumer implements Runnable {
           break;
         default:
           // FIXME: Revisit this logic.
-          System.out.println("Assume that message is coming from unknown topic. Send to handlers anyway");
+          LOGGER.warn("Assume that message is coming from unknown topic. Send to handlers anyway");
           sendMessage(record.value());
         }
       }
@@ -48,15 +48,15 @@ public class MessageConsumer implements Runnable {
       JSONObject eventObject = null;
       try {
         eventObject = new JSONObject(record);
+        final String eventName = eventObject.getString(AttributeConstants.ATTR_EVENT_NAME);
+        LOGGER.debug("eventName {} ", eventName);
+        try {
+          CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
+        } catch (Exception e) {
+          LOGGER.error("Error while processing event", e);
+        }
       } catch (Exception e) {
         LOGGER.error("Unable to parse kafka message. It should be JSONObject", e);
-      }
-      final String eventName = eventObject.getString(AttributeConstants.ATTR_EVENT_NAME);
-      LOGGER.debug("eventName {} ", eventName);
-      try {
-        CommandProcessorBuilder.lookupBuilder(eventName).build(eventObject);
-      } catch (Exception e) {
-        LOGGER.error("Error while processing event", e);
       }
     }
   }

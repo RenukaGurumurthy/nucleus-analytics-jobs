@@ -43,7 +43,7 @@ public class ProcessItemCreate {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
         if (user != null && contentFormat != null) {
-          updateContentTable(contentGooruId, contentFormat, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE));
+          updateContentTable(contentGooruId, contentFormat, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE),payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.SUBJECT_BUCKET));
         }
         return null;
       }
@@ -62,10 +62,10 @@ public class ProcessItemCreate {
 
   }
 
-  private void updateContentTable(String contentGooruId, String contentFormat, String title) {
+  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId) {
     if (title != null) {
-      LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, contentFormat);
-      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title);
+      LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, taxSubjectId, contentFormat);
+      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId);
       LOGGER.debug("Content inserted successfully...");
     } else {
       LOGGER.debug("Title can not be null...");
