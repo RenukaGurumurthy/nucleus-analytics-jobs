@@ -42,7 +42,7 @@ public class ProcessItemCreate {
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
-        if (user != null && contentFormat != null) {
+        if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_COURSE)) {
           updateContentTable(contentGooruId, contentFormat, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE),payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.SUBJECT_BUCKET));
         }
         return null;
