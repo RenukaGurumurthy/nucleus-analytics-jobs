@@ -31,22 +31,14 @@ public class ProcessItemCopy {
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject source = payLoad.isNull("source") ? null : payLoad.getJSONObject("source");
     JSONObject target = payLoad.isNull("target") ? null : payLoad.getJSONObject("target");
-    JSONObject context = event.isNull("context") ? null : event.getJSONObject("context");
-    JSONObject userObject = event.getJSONObject(AttributeConstants.USER);
+    JSONObject context = event.isNull("context") ? null : event.getJSONObject("context");  
 
     LOGGER.debug("context : {}", context);
     LOGGER.debug("source : {}", source);
     LOGGER.debug("target : {}", target);
     String contentFormat = payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT);
     LOGGER.debug("ContentFormat : {}", contentFormat);
-    
-    String contentGooruId =
-            context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID);
-    String userId = userObject.getString(AttributeConstants.GOORUID);
-    LOGGER.debug("contentGooruId : {}", contentGooruId);
-    LOGGER.debug("contentFormat : {}", contentFormat);
-    LOGGER.debug("userId : {}", userId);
-
+  
     if (contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_COURSE) || contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_UNIT)
             || contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_LESSON)) {
       this.totalCount = (List<Map>) TransactionExecutor.executeWithCoreDBTransaction(new DBHandler() {
@@ -67,12 +59,6 @@ public class ProcessItemCopy {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-      	  LOGGER.debug("Finding users from class_authorized_table");
-          user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISIST, contentGooruId, userId);
-          if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
-        	  LOGGER.debug("Updating users from class_authorized_table");  
-            updateClassAuthorizedTable(contentGooruId, userId);
-          }
     	  
         if (target != null) {
           updateCourseCollectionCount(
@@ -86,18 +72,6 @@ public class ProcessItemCopy {
         return null;
       }
     });
-
-  }
-  
-
-  private void updateClassAuthorizedTable(String contentGooruId, String userId) {
-    if (user.isEmpty()) {
-      LOGGER.debug("classId : {} - userId : {}", contentGooruId, userId);
-      Base.exec(QueryConstants.INSERT_AUTHORIZED_USER, contentGooruId, userId,"creator");
-      LOGGER.info("Class authorized data inserted successfully...");
-    } else {
-      LOGGER.info("User already present. Do nothing...");
-    }
 
   }
 
