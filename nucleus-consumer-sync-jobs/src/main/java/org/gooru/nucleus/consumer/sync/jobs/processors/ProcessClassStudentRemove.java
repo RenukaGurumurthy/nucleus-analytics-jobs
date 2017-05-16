@@ -9,19 +9,19 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProcessClassJoin {
+public class ProcessClassStudentRemove {
   /**
    * @author daniel
    */
   private JSONObject event;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassJoin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassStudentRemove.class);
 
-  public ProcessClassJoin(JSONObject event) {
+  public ProcessClassStudentRemove(JSONObject event) {
     this.event = event;
   }
 
   public void execute() {
-    LOGGER.debug("Processing class.join Event : {} " + event);
+    LOGGER.debug("Processing class.student.remove Event : {} " + event);
     JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
     JSONObject userObject = event.getJSONObject(AttributeConstants.USER);
     String contentGooruId =
@@ -33,8 +33,8 @@ public class ProcessClassJoin {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-        Base.exec(QueryConstants.INSERT_CLASS_MEMEBER, contentGooruId, userId, "joined");
-        LOGGER.debug("Inserted successfully :" + contentGooruId);
+        Base.exec(QueryConstants.DELETE_CLASS_MEMBER, contentGooruId, userId);
+        LOGGER.debug("Deleted successfully :" + contentGooruId);
         return null;
       }
     });
