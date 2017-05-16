@@ -1,5 +1,6 @@
 package org.gooru.nucleus.consumer.sync.jobs.commands;
 
+import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessClassJoin;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemCopy;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemCreate;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemDelete;
@@ -22,5 +23,8 @@ public final class CommandProcessorFactory {
   }
   public static void ItemUpdate(JSONObject event) {
     new ProcessItemUpdate(event).execute();
+  }
+  public static void ClassJoin(JSONObject event) {
+    new ProcessClassJoin(event).execute();
   }
 }
