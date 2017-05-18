@@ -47,6 +47,18 @@ public enum CommandProcessorBuilder {
     public void build(JSONObject event) {
       CommandProcessorFactory.ItemUpdate(event);
     }
+  },
+  CLASS_JOIN(CommandConstants.CLASS_JOIN) {
+    @Override
+    public void build(JSONObject context) {
+      CommandProcessorFactory.ClassJoin(context);
+    }
+  },
+  CLASS_STUDENT_REMOVE(CommandConstants.CLASS_STUDENT_REMOVE) {
+    @Override
+    public void build(JSONObject context) {
+      CommandProcessorFactory.ClassStudentRemove(context);
+    }
   };
 
   private String name;

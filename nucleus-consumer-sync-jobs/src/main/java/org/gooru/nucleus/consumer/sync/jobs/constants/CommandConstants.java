@@ -12,4 +12,8 @@ public final class CommandConstants {
 
   public static final String ITEM_UPDATE = "item.update";
 
+  public static final String CLASS_JOIN = "class.join";
+
+  public static final String CLASS_STUDENT_REMOVE = "class.student.remove";
+
 }
