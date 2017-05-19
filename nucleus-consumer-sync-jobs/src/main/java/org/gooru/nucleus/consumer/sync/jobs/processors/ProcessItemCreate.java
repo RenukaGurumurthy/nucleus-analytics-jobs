@@ -42,8 +42,10 @@ public class ProcessItemCreate {
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
+        
+        JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_COURSE)) {
-          updateContentTable(contentGooruId, contentFormat, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE),payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.SUBJECT_BUCKET));
+          updateContentTable(contentGooruId, contentFormat, data.getString(AttributeConstants.TITLE),data.getString(AttributeConstants.SUBJECT_BUCKET),data.getString(AttributeConstants.CODE));
         }
         return null;
       }
@@ -62,10 +64,11 @@ public class ProcessItemCreate {
 
   }
 
-  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId) {
+  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code) {
     if (title != null) {
       LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, taxSubjectId, contentFormat);
-      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId);
+      LOGGER.debug("code : {}", code);
+      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId,code);
       LOGGER.debug("Content inserted successfully...");
     } else {
       LOGGER.debug("Title can not be null...");
