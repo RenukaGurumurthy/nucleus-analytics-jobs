@@ -62,4 +62,6 @@ public class AttributeConstants {
   
   public static final  String SUBJECT_BUCKET = "subject_bucket" ;
 
+  public static final  String CODE = "code" ;
+
 }
