@@ -31,8 +31,11 @@ public class ProcessItemUpdate {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-        if (contentGooruId != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_COURSE)) {
-          updateContentTable(contentGooruId, payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.TITLE),payLoad.getJSONObject(AttributeConstants.DATA).getString(AttributeConstants.SUBJECT_BUCKET));
+        JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
+        String title = data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE);
+        String subject = data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET);
+        if (contentGooruId != null && contentFormat != null && title != null && subject != null) {
+          updateContentTable(contentGooruId, title, subject);
         }
         return null;
       }

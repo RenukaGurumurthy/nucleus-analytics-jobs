@@ -44,8 +44,10 @@ public class ProcessItemCreate {
         }
         
         JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
-        if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_COURSE)) {
-          updateContentTable(contentGooruId, contentFormat, data.getString(AttributeConstants.TITLE),data.getString(AttributeConstants.SUBJECT_BUCKET),data.getString(AttributeConstants.CODE));
+        if (data != null) {
+          updateContentTable(contentGooruId, contentFormat, data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
+                  data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
+                  data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
         }
         return null;
       }
