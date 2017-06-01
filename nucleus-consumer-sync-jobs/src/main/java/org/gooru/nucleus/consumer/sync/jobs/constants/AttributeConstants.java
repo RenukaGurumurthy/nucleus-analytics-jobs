@@ -66,6 +66,6 @@ public class AttributeConstants {
 
   public static final  String CODE = "code" ;
 
-  public static final Pattern CONTENT_FORMAT_FOR_TITLES =  Pattern.compile("collection|assessment|course");
+  public static final Pattern CONTENT_FORMAT_FOR_TITLES =  Pattern.compile("collection|assessment|course|class");
 
 }
