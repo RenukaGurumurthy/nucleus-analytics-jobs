@@ -34,7 +34,7 @@ public class ProcessItemUpdate {
         JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
         String title = data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE);
         String subject = data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET);
-        if (contentGooruId != null && contentFormat != null && title != null && subject != null) {
+        if (contentGooruId != null && contentFormat != null && AttributeConstants.CONTENT_FORMAT_FOR_TITLES.matcher(contentFormat).matches()) {
           updateContentTable(contentGooruId, title, subject);
         }
         return null;

@@ -44,7 +44,7 @@ public class ProcessItemCreate {
         }
         
         JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
-        if (data != null) {
+        if (data != null && contentFormat != null && AttributeConstants.CONTENT_FORMAT_FOR_TITLES.matcher(contentFormat).matches()) {
           updateContentTable(contentGooruId, contentFormat, data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
                   data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
