@@ -1,5 +1,7 @@
 package org.gooru.nucleus.consumer.sync.jobs.constants;
 
+import java.util.regex.Pattern;
+
 public class AttributeConstants {
 
   public static final String ATTR_EVENT_NAME = "eventName";
@@ -63,5 +65,7 @@ public class AttributeConstants {
   public static final  String SUBJECT_BUCKET = "subject_bucket" ;
 
   public static final  String CODE = "code" ;
+
+  public static final Pattern CONTENT_FORMAT_FOR_TITLES =  Pattern.compile("collection|assessment|course|class");
 
 }
