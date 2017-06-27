@@ -32,9 +32,9 @@ public class JobInitializer {
         cutOffTimeInMs = config.getLong(ConfigConstants.CUT_OFF_TIME);
         jobFrequencyInMs = config.getLong(ConfigConstants.JOB_FREQUENCY);
         // Default cut off time is 1 hour.
-        cutOffTimeInMs = cutOffTimeInMs == null ? 3600000 : cutOffTimeInMs;
+        cutOffTimeInMs = (cutOffTimeInMs == null ? 3600000 : cutOffTimeInMs);
         // Default frequency is 3 Minutes.
-        jobFrequencyInMs = cutOffTimeInMs == null ? 180000 : jobFrequencyInMs;
+        jobFrequencyInMs = (jobFrequencyInMs == null ? 180000 : jobFrequencyInMs);
 
         ReplayEvents replayTask = new ReplayEvents(cassandraClient, API_END_POINT, cutOffTimeInMs);
         time.schedule(replayTask, 0, jobFrequencyInMs);
