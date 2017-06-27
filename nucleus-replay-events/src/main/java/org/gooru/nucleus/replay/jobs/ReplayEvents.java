@@ -65,10 +65,16 @@ public class ReplayEvents extends TimerTask {
           System.exit(0);
         } else {
           startTime = minuteDateFormatter.parse(startEventTime).getTime();
-          // Set endTime..
-          endTime = (new Date().getTime() - this.cutOffTimeInMs);
           LOGGER.info("startTime : " + startEventTime);
+          // Get endTime..
+          endTime = (new Date().getTime() - this.cutOffTimeInMs);
+          System.out.println("endTimeBeforeConvert: " + endTime);
           endEventTime = minuteDateFormatter.format(new Date(endTime));
+          // NOTE : This is to avoid exceeding milliseconds values.
+          endTime = minuteDateFormatter.parse(endEventTime).getTime();
+          System.out.println("endTimeAfterConvert: " + endTime);
+          endEventTime = minuteDateFormatter.format(new Date(endTime));
+
           LOGGER.info("endTime : " + endEventTime);
         }
         if (endTime > startTime) {
