@@ -71,7 +71,7 @@ public class ReplayEvents extends TimerTask {
           endEventTime = minuteDateFormatter.format(new Date(endTime));
           LOGGER.info("endTime : " + endEventTime);
         }
-        if (endTime < startTime) {
+        if (endTime > startTime) {
           LOGGER.info("Starting JOB : " + JOB_ID);
           for (Long startDate = startTime; startDate < endTime;) {
             String currentDate = minuteDateFormatter.format(new Date(startDate));
