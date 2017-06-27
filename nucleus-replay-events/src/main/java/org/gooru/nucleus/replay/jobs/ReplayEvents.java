@@ -71,55 +71,58 @@ public class ReplayEvents extends TimerTask {
           endEventTime = minuteDateFormatter.format(new Date(endTime));
           LOGGER.info("endTime : " + endEventTime);
         }
-        LOGGER.info("Starting JOB : " + JOB_ID);
-        for (Long startDate = startTime; startDate < endTime;) {
-          String currentDate = minuteDateFormatter.format(new Date(startDate));
-          LOGGER.info("Running for :" + currentDate);
-          ResultSet eventIds = null;
-          try {
-            eventIds = findEventIdsByTime(currentDate);
-          } catch (Exception e) {
-            // FIXME:Today we can skip this exception. We need to look at it
-            // in
-            // future.
-            LOGGER.error("Unexpected Exception while getting eventIDs. Can't do anything here.." + e);
-          }
-          if (eventIds != null) {
-            for (Row eventId : eventIds) {
-              ResultSet events = null;
-              try {
-                events = findEventById(eventId.getString(AttributeConstants.EVENT_ID));
-              } catch (Exception e) {
-                // FIXME:Today we can skip this exception. We need to look at
-                // it in future.
-                LOGGER.error("Unexpected exception while getting event. Can't do anything here.." + e);
-              }
-              if (events != null) {
-                for (Row event : events) {
-                  String eventData = event.getString(AttributeConstants.FIELDS);
-                  // LOGGER.info("Event : " + "[" + eventData + "]");
-                  int status = postRequest("[" + eventData + "]");
-                  LOGGER.info("Status:" + status + " for eventID : " + new JSONObject(eventData).getString("eventId"));
-                  if (status != 200) {
-                    LOGGER.warn("Retrying request.....");
-                    Thread.sleep(1000);
-                    int retryStatus = postRequest("[" + eventData + "]");
-                    LOGGER.info("retryStatus:" + retryStatus);
+        if (endTime < startTime) {
+          LOGGER.info("Starting JOB : " + JOB_ID);
+          for (Long startDate = startTime; startDate < endTime;) {
+            String currentDate = minuteDateFormatter.format(new Date(startDate));
+            LOGGER.info("Running for :" + currentDate);
+            ResultSet eventIds = null;
+            try {
+              eventIds = findEventIdsByTime(currentDate);
+            } catch (Exception e) {
+              // FIXME:Today we can skip this exception. We need to look at it
+              // in
+              // future.
+              LOGGER.error("Unexpected Exception while getting eventIDs. Can't do anything here.." + e);
+            }
+            if (eventIds != null) {
+              for (Row eventId : eventIds) {
+                ResultSet events = null;
+                try {
+                  events = findEventById(eventId.getString(AttributeConstants.EVENT_ID));
+                } catch (Exception e) {
+                  // FIXME:Today we can skip this exception. We need to look at
+                  // it in future.
+                  LOGGER.error("Unexpected exception while getting event. Can't do anything here.." + e);
+                }
+                if (events != null) {
+                  for (Row event : events) {
+                    String eventData = event.getString(AttributeConstants.FIELDS);
+                    // LOGGER.info("Event : " + "[" + eventData + "]");
+                    int status = postRequest("[" + eventData + "]");
+                    LOGGER.info("Status:" + status + " for eventID : " + new JSONObject(eventData).getString("eventId"));
+                    if (status != 200) {
+                      LOGGER.warn("Retrying request.....");
+                      Thread.sleep(1000);
+                      int retryStatus = postRequest("[" + eventData + "]");
+                      LOGGER.info("retryStatus:" + retryStatus);
 
+                    }
                   }
                 }
               }
             }
+            // Incrementing time - one minute
+            startDate = new Date(startDate).getTime() + 60000;
+            Thread.sleep(200);
           }
-          // Incrementing time - one minute
-          startDate = new Date(startDate).getTime() + 60000;
-          Thread.sleep(200);
+          saveLastProcessedTime(endEventTime);
+          LOGGER.info("DONE!! Closing JOB: " + JOB_ID);
+          saveJobStatus(AttributeConstants.PROP_COMPLETED);
+          JOB_ID++;
+        } else {
+          LOGGER.warn("startTime should not be greater than endTime!");
         }
-        saveLastProcessedTime(endEventTime);
-        LOGGER.info("DONE!! Closing JOB: " + JOB_ID);
-        saveJobStatus(AttributeConstants.PROP_COMPLETED);
-        JOB_ID++;
-
       }
     } catch (Exception e) {
       e.printStackTrace();
