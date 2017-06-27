@@ -26,7 +26,7 @@ Since we implemented Kafka consumer to consume messages, Need not to form cluste
 
 ### Replay 3.0 class events
 
-> java -cp /tmp/nucleus-replay-events-0.1-snapshot-fat.jar: org.gooru.nucleus.replay.jobs.JobInitializer ~/nucleus-replay-config.json 201505060835 201703231600
+> java -cp /tmp/nucleus-replay-events-0.1-snapshot-fat.jar: org.gooru.nucleus.replay.jobs.JobInitializer ~/nucleus-replay-config.json
 
 #### Comments
 In this job arguments order should not change. First arguments would be config file location and then start & end time in yyyymmddhhmm format.
