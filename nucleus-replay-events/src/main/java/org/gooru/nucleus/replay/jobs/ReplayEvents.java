@@ -53,7 +53,6 @@ public class ReplayEvents extends TimerTask {
       if (jobStatus != null && jobStatus.equalsIgnoreCase(AttributeConstants.PROP_INPROGRESS)) {
         LOGGER.warn("Previous job is still running. Halting JOB : " + JOB_ID);
       } else {
-        saveJobStatus(AttributeConstants.PROP_INPROGRESS);
         ResultSet startTimeResultSet = findEventStartTime();
         if (startTimeResultSet != null) {
           for (Row eventTime : startTimeResultSet) {
@@ -68,16 +67,15 @@ public class ReplayEvents extends TimerTask {
           LOGGER.info("startTime : " + startEventTime);
           // Get endTime..
           endTime = (new Date().getTime() - this.cutOffTimeInMs);
-          System.out.println("endTimeBeforeConvert: " + endTime);
           endEventTime = minuteDateFormatter.format(new Date(endTime));
           // NOTE : This is to avoid exceeding milliseconds values.
           endTime = minuteDateFormatter.parse(endEventTime).getTime();
-          System.out.println("endTimeAfterConvert: " + endTime);
           endEventTime = minuteDateFormatter.format(new Date(endTime));
 
           LOGGER.info("endTime : " + endEventTime);
         }
         if (endTime > startTime) {
+          saveJobStatus(AttributeConstants.PROP_INPROGRESS);
           LOGGER.info("Starting JOB : " + JOB_ID);
           for (Long startDate = startTime; startDate < endTime;) {
             String currentDate = minuteDateFormatter.format(new Date(startDate));
