@@ -12,7 +12,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.gooru.nucleus.replay.jobs.constants.AttributeConstants;
 import org.gooru.nucleus.replay.jobs.constants.ConfigConstants;
 import org.gooru.nucleus.replay.jobs.infra.CassandraClient;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +103,7 @@ public class ReplayEvents extends TimerTask {
                     String eventData = event.getString(AttributeConstants.FIELDS);
                     // LOGGER.info("Event : " + "[" + eventData + "]");
                     int status = postRequest("[" + eventData + "]");
-                    LOGGER.info("Status:" + status + " for eventID : " + new JSONObject(eventData).getString("eventId"));
+                    LOGGER.info("Status:" + status + " for eventID : " + eventId);
                     if (status != 200) {
                       LOGGER.warn("Retrying request.....");
                       Thread.sleep(1000);
