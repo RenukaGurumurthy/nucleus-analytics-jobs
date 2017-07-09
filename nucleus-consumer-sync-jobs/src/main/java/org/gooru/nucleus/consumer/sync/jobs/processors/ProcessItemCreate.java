@@ -49,6 +49,16 @@ public class ProcessItemCreate {
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
                   data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
         }
+        
+        if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
+        	updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID), 
+        			data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID), 
+        			data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID), 
+        			data.isNull(AttributeConstants.ATTR_CONTENT_TYPE) ? null : data.getString(AttributeConstants.ATTR_CONTENT_TYPE),
+        			data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
+        			data.isNull(AttributeConstants.ATTR_UPDATED_AT) ? null : data.getString(AttributeConstants.ATTR_UPDATED_AT));            
+          }
+        
         return null;
       }
     });
@@ -77,4 +87,14 @@ public class ProcessItemCreate {
     }
 
   }
+  
+  private void updateLearnerBookmarksTable(String id, String contentId, String userId, String contentType, String title, String updated_at) {
+	  if (id != null && contentId != null && userId != null && contentType != null) {
+		  Base.exec(QueryConstants.INSERT_LEARNER_BOOKMARKS, id, contentId, userId, contentType, title, updated_at);
+	      LOGGER.debug("Learner Bookmarks inserted successfully...");  
+	  } else {
+	      LOGGER.debug("id, contentId, userId or contentType cannot be null for bookmarks. Record not inserted");
+	  }
+
+	  }
 }
