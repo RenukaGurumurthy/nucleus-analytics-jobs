@@ -1,5 +1,8 @@
 package org.gooru.nucleus.consumer.sync.jobs.processors;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +20,10 @@ public class ProcessItemCreate {
   private JSONObject event;
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessItemCreate.class);
   private List<Map> user = null;
-
+  private static SimpleDateFormat minuteDateFormatter;
   public ProcessItemCreate(JSONObject event) {
     this.event = event;
+    minuteDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
   }
 
   public void execute() {
@@ -49,16 +53,20 @@ public class ProcessItemCreate {
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
                   data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
         }
-        
+                
         if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
-        	updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID), 
-        			data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID), 
-        			data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID), 
-        			data.isNull(AttributeConstants.ATTR_CONTENT_TYPE) ? null : data.getString(AttributeConstants.ATTR_CONTENT_TYPE),
-        			data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
-        			data.isNull(AttributeConstants.ATTR_UPDATED_AT) ? null : data.getString(AttributeConstants.ATTR_UPDATED_AT));            
-          }
-        
+          try {
+            updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID),
+                    data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID),
+                    data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID),
+                    data.isNull(AttributeConstants.ATTR_CONTENT_TYPE) ? null : data.getString(AttributeConstants.ATTR_CONTENT_TYPE),
+                    data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
+                    data.isNull(AttributeConstants.ATTR_UPDATED_AT) ? null
+                            : new Timestamp(minuteDateFormatter.parse(data.getString(AttributeConstants.ATTR_UPDATED_AT)).getTime()));
+          } catch (ParseException e) {
+            LOGGER.error("Date ParseException while insert learner bookmarks {} ", e);
+          } 
+        }
         return null;
       }
     });
@@ -88,7 +96,7 @@ public class ProcessItemCreate {
 
   }
   
-  private void updateLearnerBookmarksTable(String id, String contentId, String userId, String contentType, String title, String updated_at) {
+  private void updateLearnerBookmarksTable(String id, String contentId, String userId, String contentType, String title, Timestamp updated_at) {
 	  if (id != null && contentId != null && userId != null && contentType != null) {
 		  Base.exec(QueryConstants.INSERT_LEARNER_BOOKMARKS, id, contentId, userId, contentType, title, updated_at);
 	      LOGGER.debug("Learner Bookmarks inserted successfully...");  
