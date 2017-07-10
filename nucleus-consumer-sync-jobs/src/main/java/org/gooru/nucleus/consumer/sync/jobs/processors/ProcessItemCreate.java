@@ -55,17 +55,19 @@ public class ProcessItemCreate {
         }
                 
         if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
-          try {
-            updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID),
-                    data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID),
-                    data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID),
-                    data.isNull(AttributeConstants.ATTR_CONTENT_TYPE) ? null : data.getString(AttributeConstants.ATTR_CONTENT_TYPE),
-                    data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
-                    data.isNull(AttributeConstants.ATTR_UPDATED_AT) ? null
-                            : new Timestamp(minuteDateFormatter.parse(data.getString(AttributeConstants.ATTR_UPDATED_AT)).getTime()));
-          } catch (ParseException e) {
-            LOGGER.error("Date ParseException while insert learner bookmarks {} ", e);
-          } 
+          Timestamp updatedAt = null;
+          if (!data.isNull(AttributeConstants.ATTR_UPDATED_AT)) {
+            try {
+              updatedAt = new Timestamp(minuteDateFormatter.parse(data.getString(AttributeConstants.ATTR_UPDATED_AT)).getTime());
+            } catch (ParseException e) {
+              LOGGER.error("Date ParseException while parsing updated at attribute {} ", e);
+            }
+          }
+          updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID),
+                  data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID),
+                  data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID),
+                  data.isNull(AttributeConstants.ATTR_CONTENT_TYPE) ? null : data.getString(AttributeConstants.ATTR_CONTENT_TYPE),
+                  data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE), updatedAt);
         }
         return null;
       }
