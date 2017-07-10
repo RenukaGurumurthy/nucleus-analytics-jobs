@@ -56,4 +56,11 @@ public class QueryConstants {
   /*************************** Class Member update **************************************************/
   public static final String INSERT_CLASS_MEMEBER = "INSERT INTO class_member (class_id, user_id, class_member_status) VALUES (?,?,?)";
   public static final String DELETE_CLASS_MEMBER = "DELETE FROM class_member WHERE class_id = ? AND user_id = ?";
+  
+  /*************************** Update Learner Bookmarks Table **************************************************/
+  
+  public static final String INSERT_LEARNER_BOOKMARKS = "INSERT INTO learner_bookmarks (id, content_id, user_id, "
+  		+ "content_type, title, updated_at) VALUES (?,?,?,?,?,?)";
+  public static final String DELETE_LEARNER_BOOKMARKS = "DELETE FROM learner_bookmarks WHERE id = ? AND content_id = ? AND user_id = ?";
+  
 }

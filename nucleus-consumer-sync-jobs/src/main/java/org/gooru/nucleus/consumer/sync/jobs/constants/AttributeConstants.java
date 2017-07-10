@@ -54,6 +54,16 @@ public class AttributeConstants {
 
   public static final  String ATTR_EXT_ASSESSMENT_COUNT = "ext_assessment_count" ;
   
+  public static final  String ATTR_ID = "id" ;
+  
+  public static final  String ATTR_CONTENT_ID = "content_id";
+  
+  public static final  String ATTR_USER_ID = "user_id";
+  
+  public static final  String ATTR_CONTENT_TYPE = "content_type";
+  
+  public static final  String ATTR_UPDATED_AT = "updated_at";
+  
   public static final  String USER = "user";
   
   public static final  String GOORUID = "gooruUId" ;
@@ -67,5 +77,7 @@ public class AttributeConstants {
   public static final  String CODE = "code" ;
 
   public static final Pattern CONTENT_FORMAT_FOR_TITLES =  Pattern.compile("collection|assessment|course|class");
+  
+  public static final String BOOKMARK = "bookmark";
 
 }
