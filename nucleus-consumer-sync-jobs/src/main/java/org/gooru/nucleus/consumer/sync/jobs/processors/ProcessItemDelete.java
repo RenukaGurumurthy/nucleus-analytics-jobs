@@ -44,12 +44,8 @@ public class ProcessItemDelete {
         LOGGER.info("updateCourseCollectionCount DONE");
         if (classId != null) {
           reCompute(classId, leastContentId, contentFormat);
-        }
-        
-        if (contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
-        	updateLearnerBookmarksTable(context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null
-        			: context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID));            
-          }
+        }       
+
         return null;
       }
     });
@@ -111,13 +107,5 @@ public class ProcessItemDelete {
     LOGGER.debug("Deleted record for class : {} - contentFormat : {} - content : {} ", classId, contentFormat, leastContentId);
 
   }
-  
-  private void updateLearnerBookmarksTable(String id) {
-	  if (id != null) {
-		  Base.exec(QueryConstants.DELETE_LEARNER_BOOKMARKS, id);
-	      LOGGER.debug("Learner Bookmark deleted");  
-	  } else {
-	      LOGGER.debug("id, contentId, userId cannot be null for bookmarks. Record not deleted from Learner Bookmarks");
-	  }
-  }
+
 }
