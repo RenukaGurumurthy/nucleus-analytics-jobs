@@ -8,7 +8,7 @@ This project contains all type of migration scripts.
 
 ## Running Build
 
-The default task is *shadowJar* which is provided by plugin. So running *gradle* from command line will run *shadowJar* and it will create a fat jar in build/libs folder. Note that there is artifact name specified in build file and hence it will take the name from directory housing the project.
+The default task is *shadowJar* which is provided by plugin. So running *gradle build shadow* from command line will run *shadowJar* and it will create a fat jar in build/libs inside respective jobs folder. Note that there is artifact name specified in build file and hence it will take the name from directory housing the project.
 
 Once the far Jar is created, it could be run as any other Java application.
 
@@ -16,4 +16,17 @@ Once the far Jar is created, it could be run as any other Java application.
 
 Following command could be used, from the base directory.
 
-> java -classpath build/libs/nucleus-analytics-jobs-fat.jar: -Dvertx.metrics.options.enabled=true -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.SLF4JLogDelegateFactory io.vertx.core.Launcher -conf nucleus-analytics-jobs-config.json
+### Consumer JOB
+
+> java -cp nucleus-consumer-sync-jobs/build/libs/nucleus-consumer-sync-jobs-0.1-snapshot-fat.jar: org.gooru.nucleus.consumer.sync.jobs.JobInitializer nucleus-consumer-sync-jobs/src/main/resources/nucleus-consumer-sync-jobs-config.json
+
+#### Comments
+
+Since we implemented Kafka consumer to consume messages, Need not to form cluster. Please make sure correct Kafka topic and group ID. If you want to deploy same handlers multiple time to handle the request traffic, group ID should be same. So that it will be act as loadbalancer.
+
+### Replay 3.0 class events
+
+> java -cp /tmp/nucleus-replay-events-0.1-snapshot-fat.jar: org.gooru.nucleus.replay.jobs.JobInitializer ~/nucleus-replay-config.json
+
+#### Comments
+In this job arguments order should not change. First arguments would be config file location and then start & end time in yyyymmddhhmm format.
