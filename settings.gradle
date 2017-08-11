@@ -16,4 +16,8 @@ include 'api'
 include 'services:webservice'
 */
 
+include ':nucleus-consumer-sync-jobs'
+include ':nucleus-replay-events'
+project(':nucleus-consumer-sync-jobs').projectDir = new File(settingsDir, './nucleus-consumer-sync-jobs')
+project(':nucleus-replay-events').projectDir = new File(settingsDir, './nucleus-replay-events')
 rootProject.name = 'nucleus-analytics-jobs'
