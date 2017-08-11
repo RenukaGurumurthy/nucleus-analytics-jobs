@@ -48,8 +48,8 @@ public class QueryConstants {
   
   /*************************** Content update **************************************************/
 
-  public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title, tax_subject_id,class_code)VALUES(?,?,?,?,?)";
-  public static final String UPDATE_CONTENT = "UPDATE content SET title = ?, tax_subject_id = ? WHERE id = ? ";
+  public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title, tax_subject_id,class_code, display_code)VALUES(?,?,?,?,?,?)";
+  public static final String UPDATE_CONTENT = "UPDATE content SET title = ?, tax_subject_id = ?, display_code = ? WHERE id = ? ";
  
   /**********************************************************************************************/
 

@@ -27,7 +27,7 @@ public class ProcessItemCreate {
   }
 
   public void execute() {
-    System.out.println("Processing Create Event : {} " + event);
+    LOGGER.debug("Processing Create Event : {} " + event);
     JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject userObject = event.getJSONObject(AttributeConstants.USER);
@@ -51,7 +51,8 @@ public class ProcessItemCreate {
         if (data != null && contentFormat != null && AttributeConstants.CONTENT_FORMAT_FOR_TITLES.matcher(contentFormat).matches()) {
           updateContentTable(contentGooruId, contentFormat, data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
-                  data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
+                  data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE),
+                  data.isNull(AttributeConstants.DISPLAY_CODE) ? null : data.getString(AttributeConstants.DISPLAY_CODE));
         }
                 
         if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
@@ -86,7 +87,7 @@ public class ProcessItemCreate {
 
   }
 
-  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code) {
+  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code, String displayCode) {
     if (title != null) {
       LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, taxSubjectId, contentFormat);
       LOGGER.debug("code : {}", code);
