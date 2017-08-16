@@ -81,5 +81,7 @@ public class AttributeConstants {
   public static final Pattern CONTENT_FORMAT_FOR_TITLES =  Pattern.compile("collection|assessment|course|class|unit|lesson|question|resource");
   
   public static final String BOOKMARK = "bookmark";
+  
+  public static final  String TAXONOMY = "taxonomy" ;
 
 }

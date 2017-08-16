@@ -52,7 +52,7 @@ public class ProcessItemCreate {
           updateContentTable(contentGooruId, contentFormat, data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
                   data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE),
-                  data.isNull(AttributeConstants.DISPLAY_CODE) ? null : data.getString(AttributeConstants.DISPLAY_CODE));
+                  data.isNull(AttributeConstants.TAXONOMY) ? null : data.getJSONObject(AttributeConstants.TAXONOMY).toString());
         }
                 
         if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
@@ -87,11 +87,12 @@ public class ProcessItemCreate {
 
   }
 
-  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code, String displayCode) {
+  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code, String taxonomy) {
     if (title != null) {
       LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, taxSubjectId, contentFormat);
       LOGGER.debug("code : {}", code);
-      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId,code);
+      LOGGER.debug("taxonomy : {}", taxonomy);
+      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId,code,taxonomy);
       LOGGER.debug("Content inserted successfully...");
     } else {
       LOGGER.debug("Title can not be null...");
