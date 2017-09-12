@@ -35,7 +35,7 @@ public class JobInitializer {
       if (config != null && config.length() > 0) {
         service = Executors.newFixedThreadPool(10);
         DataSourceRegistry.getInstance().initializeComponent(config);
-        // createConsumer(config);
+        createConsumer(config);
 
         TimerTask courseCompetencyTotalCount = new SyncCourseCompetencyTotalCount(config);
         TimerTask staticCompetencyCount = new SyncStaticCourseCompetency(config);
