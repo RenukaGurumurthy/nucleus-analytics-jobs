@@ -37,11 +37,10 @@ public class JobInitializer {
         DataSourceRegistry.getInstance().initializeComponent(config);
         createConsumer(config);
 
-        TimerTask courseCompetencyTotalCount = new SyncCourseCompetencyTotalCount(config);
-        TimerTask staticCompetencyCount = new SyncStaticCourseCompetency(config);
 
         if (!config.isNull(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT)) {
           JSONObject courseCompetencyCountConfig = config.getJSONObject(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT);
+          TimerTask courseCompetencyTotalCount = new SyncCourseCompetencyTotalCount(courseCompetencyCountConfig);
           LOGGER.debug("SyncCourseCompetencyTotalCount : {} ", courseCompetencyCountConfig);
           courseCompetencyTotalCountTimer.scheduleAtFixedRate(courseCompetencyTotalCount, 500,
                   courseCompetencyCountConfig.isNull(AttributeConstants.DELAY) ? 100000
@@ -49,8 +48,9 @@ public class JobInitializer {
         }
         if (!config.isNull(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY)) {
           JSONObject staticCourseCompetencyConfig = config.getJSONObject(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY);
+          TimerTask staticCourseCompetency = new SyncStaticCourseCompetency(staticCourseCompetencyConfig);
           LOGGER.debug("SyncStaticCourseCompetency : {} ", staticCourseCompetencyConfig);
-          staticCourseCompetencyTimer.scheduleAtFixedRate(staticCompetencyCount, 500,
+          staticCourseCompetencyTimer.scheduleAtFixedRate(staticCourseCompetency, 500,
                   staticCourseCompetencyConfig.isNull(AttributeConstants.DELAY) ? 100000
                           : staticCourseCompetencyConfig.getLong(AttributeConstants.DELAY));
         }

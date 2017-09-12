@@ -22,11 +22,7 @@ public class SyncCourseCompetencyTotalCount extends TimerTask {
   }
 
   public SyncCourseCompetencyTotalCount(JSONObject config) {
-    if (!config.isNull(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT)) {
-      this.config = config.getJSONObject(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT);
-    } else {
-      LOGGER.error("SyncCourseCompetencyTotalCount config NOT FOUND!!");
-    }
+    this.config = config;
   }
 
   @Override

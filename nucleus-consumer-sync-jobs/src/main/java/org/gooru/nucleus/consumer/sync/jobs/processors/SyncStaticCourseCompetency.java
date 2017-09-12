@@ -21,11 +21,7 @@ public class SyncStaticCourseCompetency extends TimerTask {
   }
 
   public SyncStaticCourseCompetency(JSONObject config) {
-    if (!config.isNull(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY)) {
-      this.config = config.getJSONObject(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY);
-    } else {
-      LOGGER.error("SyncStaticCourseCompetency config NOT FOUND!!");
-    }
+    this.config = config;
   }
 
   @Override
