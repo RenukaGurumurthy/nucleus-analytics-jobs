@@ -56,7 +56,7 @@ public class SyncCourseCompetencyTotalCount extends TimerTask {
           @Override
           public Object execute() {
             try {
-              Base.exec(config.getString(AttributeConstants.TRUNCATE_TABLE));
+              Base.exec("TRUNCATE " + config.getString(AttributeConstants.TRUNCATE_TABLE));
               LOGGER.info("Table truncated..");
             } catch (Exception e) {
               LOGGER.error("Error while truncating table", e);
