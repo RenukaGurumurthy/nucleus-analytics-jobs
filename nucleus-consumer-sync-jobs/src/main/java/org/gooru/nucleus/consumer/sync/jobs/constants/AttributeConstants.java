@@ -83,5 +83,24 @@ public class AttributeConstants {
   public static final String BOOKMARK = "bookmark";
   
   public static final  String TAXONOMY = "taxonomy" ;
+  
+  public static final String SYNC_COURSE_COMPETENCY_TOTAL_COUNT = "SyncCourseCompetencyTotalCount";
+
+  public static final String SYNC_STATIC_COURSE_COMPETENCY = "SyncStaticCourseCompetency";
+
+  public static final String DELAY = "delay";
+
+  public static final String EXPORT_QUERY = "exportQuery";
+  
+  public static final String DUMP_LOCATION = "dumpLocation";
+
+  public static final String DUMP_FILE_NAME = "dumpFileName";
+
+  public static final String TRUNCATE_TABLE = "truncateTable";
+
+  public static final String IMPORT_TABLE = "importTable";
+
+  public static final String ATTRIBUTES = "attributes";
+
 
 }
