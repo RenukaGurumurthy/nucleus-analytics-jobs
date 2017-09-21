@@ -54,6 +54,12 @@ public enum CommandProcessorBuilder {
       CommandProcessorFactory.ClassJoin(context);
     }
   },
+  COLLABORATORS_UPDATE(CommandConstants.COLLABORATORS_UPDATE) {
+	    @Override
+	    public void build(JSONObject context) {
+	      CommandProcessorFactory.CollaboratorsUpdate(context);
+	    }
+	  },
   CLASS_STUDENT_REMOVE(CommandConstants.CLASS_STUDENT_REMOVE) {
     @Override
     public void build(JSONObject context) {

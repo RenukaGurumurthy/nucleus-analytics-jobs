@@ -42,7 +42,7 @@ public class ProcessItemCreate {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-        user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISIST, contentGooruId, userId);
+        user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISTS, contentGooruId, userId);
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
