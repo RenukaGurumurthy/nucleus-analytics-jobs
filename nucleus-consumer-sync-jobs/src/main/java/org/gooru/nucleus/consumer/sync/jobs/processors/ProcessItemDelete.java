@@ -34,7 +34,7 @@ public class ProcessItemDelete {
                 context.isNull(AttributeConstants.ATTR_CONTENT_GOORU_ID) ? null : context.getString(AttributeConstants.ATTR_CONTENT_GOORU_ID);
         String contentFormat =
                 payLoad.isNull(AttributeConstants.ATTR_CONTENT_FORMAT) ? null : payLoad.getString(AttributeConstants.ATTR_CONTENT_FORMAT);
-        JSONObject data = payLoad.getJSONObject(AttributeConstants.DATA);
+        
         LOGGER.debug("courseId : {}", courseId);
         LOGGER.debug("unitId : {}", unitId);
         LOGGER.debug("lessonId : {}", lessonId);
@@ -44,13 +44,8 @@ public class ProcessItemDelete {
         LOGGER.info("updateCourseCollectionCount DONE");
         if (classId != null) {
           reCompute(classId, leastContentId, contentFormat);
-        }
-        
-        if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
-        	updateLearnerBookmarksTable(data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID), 
-        			data.isNull(AttributeConstants.ATTR_CONTENT_ID) ? null : data.getString(AttributeConstants.ATTR_CONTENT_ID), 
-        			data.isNull(AttributeConstants.ATTR_USER_ID) ? null : data.getString(AttributeConstants.ATTR_USER_ID));            
-          }
+        }       
+
         return null;
       }
     });
@@ -112,13 +107,5 @@ public class ProcessItemDelete {
     LOGGER.debug("Deleted record for class : {} - contentFormat : {} - content : {} ", classId, contentFormat, leastContentId);
 
   }
-  
-  private void updateLearnerBookmarksTable(String id, String contentId, String userId) {
-	  if (id != null && contentId != null && userId != null) {
-		  Base.exec(QueryConstants.DELETE_LEARNER_BOOKMARKS, id, contentId, userId);
-	      LOGGER.debug("Learner Bookmark deleted");  
-	  } else {
-	      LOGGER.debug("id, contentId, userId cannot be null for bookmarks. Record not deleted from Learner Bookmarks");
-	  }
-  }
+
 }

@@ -61,6 +61,7 @@ public class QueryConstants {
   
   public static final String INSERT_LEARNER_BOOKMARKS = "INSERT INTO learner_bookmarks (id, content_id, user_id, "
   		+ "content_type, title, updated_at) VALUES (?,?,?,?,?,?)";
-  public static final String DELETE_LEARNER_BOOKMARKS = "DELETE FROM learner_bookmarks WHERE id = ? AND content_id = ? AND user_id = ?";
+  //Once bookmarked, do not delete Bookmarks from learner_bookmarks, even if they are deleted from Core Bookmarks
+  //public static final String DELETE_LEARNER_BOOKMARKS = "DELETE FROM learner_bookmarks WHERE id = ?";
   
 }

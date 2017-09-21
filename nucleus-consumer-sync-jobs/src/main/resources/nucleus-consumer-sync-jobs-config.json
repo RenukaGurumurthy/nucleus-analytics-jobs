@@ -9,10 +9,10 @@
 },
 "analyticsDataSource":{
 "nucleus.ds.type":"hikari",
-"username":"nucleus",
+"username":"reports_user",
 "password":"nucleus",
-"autoCommit":false,
-"jdbcUrl":"jdbc:postgresql://localhost:5432/nucleus",
+"autoCommit":true,
+"jdbcUrl":"jdbc:postgresql://localhost:5432/reports_db",
 "maximumPoolSize":5
 },
 "kafka":{
@@ -21,5 +21,23 @@
 "group.id":"test",
 "session.timeout.ms":"6000",
 "message.bus.send.timeout.seconds":10
+},
+"SyncCourseCompetencyTotalCount":{
+"delay":10000,
+"exportQuery":"select l.course_id,l.unit_id,l.lesson_id,count(distinct tc.id) comp_count from lesson l left join collection cl on (l.lesson_id = cl.lesson_id and cl.format = 'assessment' and cl.is_deleted = false) left join lateral jsonb_object_keys(cl.taxonomy) col(tax) on true left join taxonomy_code tc on (col.tax = tc.id and tc.code_type <> 'learning_target_level_0')  where l.is_deleted = false and l.tenant = 'f693bd0a-a67e-4e2d-92c7-0b75d0b0dd3e' group by 1,2,3",
+"dumpLocation":"/tmp",
+"dumpFileName":"course_competency_count.csv",
+"truncateTable":"course_competency_count",
+"importTable":"course_competency_count",
+"attributes":"course_id,unit_id,lesson_id,competency_count"
+},
+"SyncStaticCourseCompetency":{
+"delay":10000,
+"exportQuery":"select distinct on ( c.course_id,c.unit_id, c.lesson_id, c.id, col.tax) c.course_id,c.unit_id, c.lesson_id, c.id,col.tax as competency, tc.code as display_code from collection c left join lateral jsonb_object_keys(c.taxonomy) col(tax) on true left join taxonomy_code tc on (col.tax = tc.id) where  c.taxonomy is not null and c.course_id is not null and c.tenant = 'f693bd0a-a67e-4e2d-92c7-0b75d0b0dd3e' and c.is_deleted = false",
+"dumpLocation":"/tmp",
+"dumpFileName":"static_collection_competency.csv",
+"truncateTable":"static_collection_competency",
+"importTable":"static_collection_competency",
+"attributes":null
 }
 }

@@ -5,14 +5,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.gooru.nucleus.consumer.sync.jobs.constants.AttributeConstants;
 import org.gooru.nucleus.consumer.sync.jobs.constants.ConfigConstants;
 import org.gooru.nucleus.consumer.sync.jobs.infra.DataSourceRegistry;
 import org.gooru.nucleus.consumer.sync.jobs.processors.MessageConsumer;
+import org.gooru.nucleus.consumer.sync.jobs.processors.SyncCourseCompetencyTotalCount;
+import org.gooru.nucleus.consumer.sync.jobs.processors.SyncStaticCourseCompetency;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +26,8 @@ public class JobInitializer {
   private static KafkaConsumer<String, String> consumer = null;
   private static ExecutorService service = null;
   private static final Logger LOGGER = LoggerFactory.getLogger(JobInitializer.class);
+  private static final Timer courseCompetencyTotalCountTimer = new Timer();
+  private static final Timer staticCourseCompetencyTimer = new Timer();
 
   public static void main(String args[]) {
     if (args.length > 0) {
@@ -29,6 +36,25 @@ public class JobInitializer {
         service = Executors.newFixedThreadPool(10);
         DataSourceRegistry.getInstance().initializeComponent(config);
         createConsumer(config);
+
+
+        if (!config.isNull(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT)) {
+          JSONObject courseCompetencyCountConfig = config.getJSONObject(AttributeConstants.SYNC_COURSE_COMPETENCY_TOTAL_COUNT);
+          TimerTask courseCompetencyTotalCount = new SyncCourseCompetencyTotalCount(courseCompetencyCountConfig);
+          LOGGER.debug("SyncCourseCompetencyTotalCount : {} ", courseCompetencyCountConfig);
+          courseCompetencyTotalCountTimer.scheduleAtFixedRate(courseCompetencyTotalCount, 500,
+                  courseCompetencyCountConfig.isNull(AttributeConstants.DELAY) ? 100000
+                          : courseCompetencyCountConfig.getLong(AttributeConstants.DELAY));
+        }
+        if (!config.isNull(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY)) {
+          JSONObject staticCourseCompetencyConfig = config.getJSONObject(AttributeConstants.SYNC_STATIC_COURSE_COMPETENCY);
+          TimerTask staticCourseCompetency = new SyncStaticCourseCompetency(staticCourseCompetencyConfig);
+          LOGGER.debug("SyncStaticCourseCompetency : {} ", staticCourseCompetencyConfig);
+          staticCourseCompetencyTimer.scheduleAtFixedRate(staticCourseCompetency, 500,
+                  staticCourseCompetencyConfig.isNull(AttributeConstants.DELAY) ? 100000
+                          : staticCourseCompetencyConfig.getLong(AttributeConstants.DELAY));
+        }
+
       } else {
         LOGGER.error("Configs can not be empty");
         System.exit(0);
@@ -79,4 +105,5 @@ public class JobInitializer {
     }
     return configJSON;
   }
+
 }
