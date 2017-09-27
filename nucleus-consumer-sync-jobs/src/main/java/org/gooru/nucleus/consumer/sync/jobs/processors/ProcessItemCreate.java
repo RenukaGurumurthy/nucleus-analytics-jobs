@@ -27,7 +27,7 @@ public class ProcessItemCreate {
   }
 
   public void execute() {
-    System.out.println("Processing Create Event : {} " + event);
+    LOGGER.debug("Processing Create Event : {} " + event);
     JSONObject context = event.getJSONObject(AttributeConstants.ATTR_CONTEXT);
     JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
     JSONObject userObject = event.getJSONObject(AttributeConstants.USER);
@@ -42,7 +42,7 @@ public class ProcessItemCreate {
     TransactionExecutor.executeWithAnalyticsDBTransaction(new DBHandler() {
       @Override
       public Object execute() {
-        user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISIST, contentGooruId, userId);
+        user = Base.findAll(QueryConstants.SELECT_AUTHORIZED_USER_EXISTS, contentGooruId, userId);
         if (user != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.ATTR_CLASS)) {
           updateClassAuthorizedTable(contentGooruId, userId);
         }
@@ -51,7 +51,8 @@ public class ProcessItemCreate {
         if (data != null && contentFormat != null && AttributeConstants.CONTENT_FORMAT_FOR_TITLES.matcher(contentFormat).matches()) {
           updateContentTable(contentGooruId, contentFormat, data.isNull(AttributeConstants.TITLE) ? null : data.getString(AttributeConstants.TITLE),
                   data.isNull(AttributeConstants.SUBJECT_BUCKET) ? null : data.getString(AttributeConstants.SUBJECT_BUCKET),
-                  data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE));
+                  data.isNull(AttributeConstants.CODE) ? null : data.getString(AttributeConstants.CODE),
+                  data.isNull(AttributeConstants.TAXONOMY) ? null : data.getJSONObject(AttributeConstants.TAXONOMY).toString());
         }
                 
         if (data != null && contentFormat != null && contentFormat.equalsIgnoreCase(AttributeConstants.BOOKMARK)) {
@@ -86,11 +87,12 @@ public class ProcessItemCreate {
 
   }
 
-  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code) {
+  private void updateContentTable(String contentGooruId, String contentFormat, String title, String taxSubjectId,String code, String taxonomy) {
     if (title != null) {
       LOGGER.debug("contentGooruId : {} - title : {} - contentFormat : {}", contentGooruId, title, taxSubjectId, contentFormat);
       LOGGER.debug("code : {}", code);
-      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId,code);
+      LOGGER.debug("taxonomy : {}", taxonomy);
+      Base.exec(QueryConstants.INSERT_CONTENT, contentGooruId, contentFormat, title, taxSubjectId,code,taxonomy);
       LOGGER.debug("Content inserted successfully...");
     } else {
       LOGGER.debug("Title can not be null...");

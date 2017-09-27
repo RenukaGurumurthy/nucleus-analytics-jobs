@@ -40,7 +40,7 @@ public class QueryConstants {
   
   /*************************** Class Authorized user update *************************************/
 
-  public static final String SELECT_AUTHORIZED_USER_EXISIST =  "SELECT * FROM class_authorized_users WHERE class_id = ? AND user_id = ?";
+  public static final String SELECT_AUTHORIZED_USER_EXISTS =  "SELECT * FROM class_authorized_users WHERE class_id = ? AND user_id = ?";
   public static final String INSERT_AUTHORIZED_USER = "INSERT INTO class_authorized_users(class_id,user_id,user_type)VALUES(?,?,?)";
   public static final String UPDATE_AUTHORIZED_USER = "UPDATE class_authorized_users SET user_id = ? WHERE class_id = ? ";
  
@@ -48,8 +48,8 @@ public class QueryConstants {
   
   /*************************** Content update **************************************************/
 
-  public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title, tax_subject_id,class_code)VALUES(?,?,?,?,?)";
-  public static final String UPDATE_CONTENT = "UPDATE content SET title = ?, tax_subject_id = ? WHERE id = ? ";
+  public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title, tax_subject_id,class_code, taxonomy)VALUES(?,?,?,?,?,?)";
+  public static final String UPDATE_CONTENT = "UPDATE content SET title = ?, tax_subject_id = ?, taxonomy = ? WHERE id = ? ";
  
   /**********************************************************************************************/
 
