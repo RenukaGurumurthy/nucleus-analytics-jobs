@@ -127,9 +127,6 @@ public final class DataSourceRegistry {
       case "poolName":
         config.setPoolName(dbConfig.getString(key));
         break;
-      case "initializationFailFast":
-        config.setInitializationFailFast(dbConfig.getBoolean(key));
-        break;
       case "isolationInternalQueries":
         config.setIsolateInternalQueries(dbConfig.getBoolean(key));
         break;
