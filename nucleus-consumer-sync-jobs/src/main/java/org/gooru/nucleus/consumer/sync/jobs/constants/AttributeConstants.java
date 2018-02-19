@@ -13,12 +13,24 @@ public class AttributeConstants {
   public static final String ATTR_UNIT_GOORU_ID = "unitGooruId";
 
   public static final String ATTR_LESSON_GOORU_ID = "lessonGooruId";
+  
+  public static final String ATTR_COLLECTION_GOORU_ID = "collectionGooruId";
 
   public static final String ATTR_CONTENT_GOORU_ID = "contentGooruId";
 
   public static final String ATTR_CONTENT_FORMAT = "contentFormat";
 
   public static final String ATTR_ASSESSMENT = "assessment";
+  
+  public static final String ATTR_QUESTION = "question";
+  
+  public static final String ATTR_RESOURCE = "resource";
+  
+  public static final String ATTR_SCORE = "score";
+  
+  public static final String ATTR_MAX_SCORE = "max_score";
+  
+  public static final String ATTR_TIME_SPENT = "time_spent";
 
   public static final String ATTR_EXTERNAL_ASSESSMENT = "assessment-external";
 

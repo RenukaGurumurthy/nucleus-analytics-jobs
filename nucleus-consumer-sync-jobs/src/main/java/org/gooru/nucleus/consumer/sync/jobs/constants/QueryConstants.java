@@ -7,6 +7,8 @@ public class QueryConstants {
   public static final String UPDATE_COLLECTION_COUNT = "UPDATE course_collection_count SET collection_count = (collection_count + ?) WHERE course_id = ? AND unit_id = ? AND lesson_id = ?";
 
   public static final String UPDATE_ASSESSMENT_COUNT = "UPDATE course_collection_count SET assessment_count = (assessment_count + ?)  WHERE course_id = ? AND unit_id = ? AND lesson_id = ?";
+  
+  public static final String UPDATE_QUESTION_COUNT_POST_DELETE_RESOURCE = "UPDATE base_reports SET question_count = (question_count + ?)  WHERE collection_id = ? AND session_id = ?";
 
   public static final String UPDATE_EXT_ASSESSMENT_COUNT = "UPDATE course_collection_count SET ext_assessment_count = (ext_assessment_count + ?) WHERE course_id = ? AND unit_id = ? AND lesson_id = ?";
 
@@ -28,13 +30,39 @@ public class QueryConstants {
 
   /*************************** DELETE Queries For ReComputations Purpose *************************/
   
-  public static final String DELETE_BASEREPORT_BY_COURSE = "DELETE FROM base_reports WHERE class_id = ? AND course_id = ?";
+  public static final String DELETE_BASEREPORT_BY_COURSE = "DELETE FROM base_reports WHERE course_id = ?";
+  
+  public static final String DELETE_BASEREPORT_BY_CLASS = "DELETE FROM base_reports WHERE class_id = ?";
  
-  public static final String DELETE_BASEREPORT_BY_UNIT = "DELETE FROM base_reports WHERE class_id = ? AND course_id = ?";
+  public static final String DELETE_BASEREPORT_BY_UNIT = "DELETE FROM base_reports WHERE course_id = ? AND unit_id = ?";
   
-  public static final String DELETE_BASEREPORT_BY_LESSON = "DELETE FROM base_reports WHERE class_id = ? AND lesson_id = ?";
+  public static final String DELETE_BASEREPORT_BY_LESSON = "DELETE FROM base_reports WHERE course_id = ? AND lesson_id = ?";
   
-  public static final String DELETE_BASEREPORT_BY_COLLECTION = "DELETE FROM base_reports WHERE class_id = ? AND collection_id = ?";
+  public static final String DELETE_BASEREPORT_BY_COLLECTION = "DELETE FROM base_reports WHERE collection_id = ?";
+  
+  public static final String GET_SESSIONS = "SELECT DISTINCT(session_id) FROM base_reports WHERE collection_id = ? and resource_id = ? "
+  		+ " AND event_name = 'collection.resource.play'";
+
+  public static final String DELETE_BASEREPORT_BY_RESOURCE = "DELETE FROM base_reports WHERE collection_id = ? AND resource_id = ? and session_id = ?";
+  
+  public static final String COMPUTE_SCORE_POST_DELETE_QUESTION = "SELECT SUM(questionData.question_score) AS score, "
+  		+ "SUM(questionData.max_score) AS max_score FROM  "
+  		+ "(SELECT DISTINCT ON (resource_id)  score AS question_score, max_score, "
+  		+ "session_id FROM base_reports WHERE collection_id = ? AND session_id = ? AND "
+  		+ "event_name = 'collection.resource.play' AND event_type = 'stop' AND resource_type = 'question' "
+  		+ "ORDER BY resource_id, updated_at desc) questionData GROUP BY session_id";
+
+  public static final String UPDATE_SCORE_TS_POST_DELETE_QUESTION = "UPDATE base_reports SET score = ?, max_score = ?, time_spent = ? "
+  		+ " WHERE collection_id = ? AND session_id = ? AND event_name = 'collection.play' AND event_type = 'stop'";
+
+
+  public static final String COMPUTE_TS_POST_DELETE = "SELECT SUM(time_spent) "
+	          + "FROM base_reports WHERE collection_id = ? AND session_id = ? AND event_name = 'collection.resource.play' AND event_type = 'stop' "
+	          + " GROUP BY session_id";
+  
+  public static final String UPDATE_TS_POST_DELETE = "UPDATE base_reports SET time_spent = ? "
+	  		+ " WHERE session_id =  ? AND collection_id = ? AND event_name = 'collection.play' AND event_type = 'stop'";
+
   
   /**********************************************************************************************/
   
