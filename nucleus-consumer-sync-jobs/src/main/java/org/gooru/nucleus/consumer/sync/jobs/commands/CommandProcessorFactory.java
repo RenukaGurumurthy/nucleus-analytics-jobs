@@ -7,6 +7,7 @@ import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemCreate;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemDelete;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemMove;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessItemUpdate;
+import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessUserActivity;
 import org.gooru.nucleus.consumer.sync.jobs.processors.ProcessCollaboratorsUpdate;
 import org.json.JSONObject;
 
@@ -34,5 +35,11 @@ public final class CommandProcessorFactory {
   }
   public static void CollaboratorsUpdate(JSONObject event) {
 	    new ProcessCollaboratorsUpdate(event).execute();	    
+	  }  
+  public static void UserSignIn(JSONObject event) {
+	    new ProcessUserActivity(event).execute();	    
+	  }
+  public static void UserSignOut(JSONObject event) {
+	    new ProcessUserActivity(event).execute();	    
 	  }
 }

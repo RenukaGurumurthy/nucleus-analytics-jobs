@@ -74,7 +74,17 @@ public class AttributeConstants {
   
   public static final  String ATTR_CONTENT_TYPE = "content_type";
   
+  public static final  String ATTR_TENANT_ID = "tenant_id" ;
+  
+  public static final  String ATTR_LOGIN_TYPE = "login_type" ;
+  
+  public static final  String ATTR_USER_CATEGORY = "user_category" ;
+  
   public static final  String ATTR_UPDATED_AT = "updated_at";
+  
+  public static final  String ATTR_CREATED_AT = "created_at";
+  
+  public static final  String ATTR_END_TIME = "endTime";
   
   public static final  String USER = "user";
   

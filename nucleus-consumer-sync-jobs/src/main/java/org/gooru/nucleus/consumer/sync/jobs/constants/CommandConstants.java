@@ -17,5 +17,9 @@ public final class CommandConstants {
   public static final String CLASS_STUDENT_REMOVE = "class.student.remove";
   
   public static final String COLLABORATORS_UPDATE = "collaborators.update";
+  
+  public static final String USER_SIGN_IN = "event.user.signin";
+  
+  public static final String USER_SIGN_OUT = "event.user.signout";
 
 }
