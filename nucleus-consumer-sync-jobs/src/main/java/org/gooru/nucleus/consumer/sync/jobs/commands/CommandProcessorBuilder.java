@@ -65,7 +65,21 @@ public enum CommandProcessorBuilder {
     public void build(JSONObject context) {
       CommandProcessorFactory.ClassStudentRemove(context);
     }
+    },
+    
+  USER_SIGN_IN(CommandConstants.USER_SIGN_IN) {
+	    @Override
+	    public void build(JSONObject context) {
+	      CommandProcessorFactory.UserSignIn(context);
+	    }
+  },  
+  USER_SIGN_OUT(CommandConstants.USER_SIGN_OUT) {
+	    @Override
+	    public void build(JSONObject context) {
+	      CommandProcessorFactory.UserSignOut(context);
+	    }
   };
+    
 
   private String name;
 
