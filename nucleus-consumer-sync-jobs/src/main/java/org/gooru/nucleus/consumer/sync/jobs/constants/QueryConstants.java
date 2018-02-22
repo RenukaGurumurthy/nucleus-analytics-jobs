@@ -89,7 +89,7 @@ public class QueryConstants {
   
 /*************************** Update User Activity Table for SignIn/SignOut**************************************************/
   
-  public static final String INSERT_USER_ACTIVITY = "INSERT INTO user_activity (event_name, user_id, tenant_id, "
-  		+ "login_type, user_category, updated_at) VALUES (?,?,?,?,?,?)";
+  public static final String INSERT_USER_ACTIVITY = "INSERT INTO user_activity (event_name, user_id, tenant_id, partner_id, tenant_root, "
+  		+ "login_type, user_category, updated_at) VALUES (?,?,?,?,?,?,?,?)";
 
 }

@@ -26,7 +26,7 @@ public class ProcessUserActivity {
 	  }
 
 	  public void execute() {
-	    LOGGER.debug("Processing User Sign In Event : {} " + event);
+	    LOGGER.debug("Processing User Activity Event : {} " + event);
 	    Long endTime = event.get(AttributeConstants.ATTR_END_TIME) != null ? Long.valueOf((event.get(AttributeConstants.ATTR_END_TIME).toString())) : null;
 	    String eventName = event.getString(AttributeConstants.ATTR_EVENT_NAME);
 	    JSONObject payLoad = event.getJSONObject(AttributeConstants.ATTR_PAY_LOAD);
@@ -43,7 +43,9 @@ public class ProcessUserActivity {
 	          Timestamp updatedAt = null;	          
 	          updatedAt = new Timestamp(endTime);
 	          updateUserActivity(eventName, data.isNull(AttributeConstants.ATTR_ID) ? null : data.getString(AttributeConstants.ATTR_ID),
-	        		  data.isNull(AttributeConstants.ATTR_TENANT_ID) ? null : data.getString(AttributeConstants.ATTR_TENANT_ID),	        		  
+	        		  data.isNull(AttributeConstants.ATTR_TENANT_ID) ? null : data.getString(AttributeConstants.ATTR_TENANT_ID),
+	        				  data.isNull(AttributeConstants.ATTR_PARTNER_ID) ? null : data.getString(AttributeConstants.ATTR_PARTNER_ID),
+	        				  data.isNull(AttributeConstants.ATTR_TENANT_ROOT) ? null : data.getString(AttributeConstants.ATTR_TENANT_ROOT),
 	        				  data.isNull(AttributeConstants.ATTR_LOGIN_TYPE) ? null : data.getString(AttributeConstants.ATTR_LOGIN_TYPE),	        		  
 	        				  data.isNull(AttributeConstants.ATTR_USER_CATEGORY) ? null : data.getString(AttributeConstants.ATTR_USER_CATEGORY),
                               updatedAt);
@@ -54,12 +56,12 @@ public class ProcessUserActivity {
 	    LOGGER.debug("DONE");
 	  }
 	  
-	  private void updateUserActivity(String eventName, String id, String tenantId, String loginType, String userCat, Timestamp updated_at) {
+	  private void updateUserActivity(String eventName, String id, String tenantId, String partnerId, String tenant_root, String loginType, String userCat, Timestamp updated_at) {
 		  if (id != null) {
-			  Base.exec(QueryConstants.INSERT_USER_ACTIVITY, eventName, id, tenantId, loginType, userCat, updated_at);
-		      LOGGER.debug("User Sign In Activity inserted successfully...");  
+			  Base.exec(QueryConstants.INSERT_USER_ACTIVITY, eventName, id, tenantId, partnerId, tenant_root, loginType, userCat, updated_at);
+		      LOGGER.debug("User Activity event inserted successfully...");  
 		  } else {
-		      LOGGER.debug("User Sign In Activity Record cannot inserted");
+		      LOGGER.debug("User Activity Record cannot inserted");
 		  }
 
 		  }
