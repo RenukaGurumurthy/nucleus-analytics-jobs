@@ -1,0 +1,77 @@
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.2"
+    }
+}
+
+plugins {
+    id 'java' // or 'groovy' Must be explicitly applied
+    id 'com.github.johnrengelman.shadow' version "1.2.2"
+}
+
+
+def localBuildFile = "./build-local.gradle"
+def useLocalBuild = new File(localBuildFile).exists()
+if (useLocalBuild) {
+    apply from : localBuildFile
+}
+
+defaultTasks 'shadowJar'
+
+if (!JavaVersion.current().java8Compatible) {
+    throw new IllegalStateException('''Nucleus:
+                                      |  This needs Java 8,
+                                      |  You are using something else,
+                                      |  Refresh. Try again.'''.stripMargin())
+}
+
+ext {
+    vertxVersion = '3.5.0'
+}
+
+version = "0.1-snapshot"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'http://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    compile "io.vertx:vertx-core:${vertxVersion}"
+    
+    // The production code uses the SLF4J logging API at compile time
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile "ch.qos.logback:logback-classic:1.0.13"
+    compile 'org.apache.httpcomponents:httpcore:4.4.1'
+    compile 'org.apache.httpcomponents:httpclient:4.5'
+    
+    //Kafka
+    compile group: 'org.apache.kafka', name: 'kafka-clients', version: '0.10.1.1'
+    
+    compile "org.postgresql:postgresql:9.4-1206-jdbc42"
+    compile "org.apache.commons:commons-dbcp2:2.0.1"
+
+    // Declare the dependency for your favourite test framework you want to use in your tests.
+    // TestNG is also supported by the Gradle Test task. Just change the
+    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+    // 'test.useTestNG()' to your build script.
+    testCompile 'junit:junit:4.12'
+}
+
+shadowJar {
+    classifier = 'fat'
+    manifest {
+        attributes 'Main-Class': 'org.gooru.jobs.sbl.event.handler.bootstrap.SBLLoginEventHandler'
+        attributes 'Created-By' : 'Gooru.org'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
