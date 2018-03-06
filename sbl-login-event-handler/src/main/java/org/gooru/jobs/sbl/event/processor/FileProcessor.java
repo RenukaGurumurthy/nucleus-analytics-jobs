@@ -5,9 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.gooru.jobs.sbl.event.handler.dispatcher.KafkaMessageDispatcher;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +19,7 @@ import io.vertx.core.json.JsonObject;
 /**
  * @author szgooru Created On: 21-Feb-2018
  */
-public class FileProcessor {
+public class FileProcessor {	
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileProcessor.class);
 	private static final Logger ERROR_LOGGER = LoggerFactory.getLogger("org.gooru.event.error.logs");
@@ -30,7 +33,14 @@ public class FileProcessor {
 				JsonObject eventBody = processLine(line);
 				if (eventBody != null) {
 					LOGGER.debug("Dispatching event:{}", eventBody);
-					KafkaMessageDispatcher.getInstance().dispatch(eventBody);
+					Future<RecordMetadata> future = KafkaMessageDispatcher.getInstance().dispatch(eventBody);
+					try {
+						RecordMetadata metadata = future.get();
+					} catch (InterruptedException e) {
+						LOGGER.error("error while getting dispatch response", e);
+					} catch (ExecutionException e) {
+						LOGGER.error("error while getting dispatch response", e);
+					}
 				} else {
 					ERROR_LOGGER.error(line);
 				}
