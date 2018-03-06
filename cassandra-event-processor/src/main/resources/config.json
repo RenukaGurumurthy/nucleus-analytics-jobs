@@ -1,0 +1,30 @@
+{
+	"log.directory": "/home/gooru/data/gooru/code/nucleus-analytics-jobs/cassandra-event-processor",
+	"systemProperties": {
+		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
+		"vertx.metrics.options.enabled": "true",
+		"logback.configurationFile": "/home/gooru/data/gooru/code/nucleus-analytics-jobs/cassandra-event-processor/logback.xml"
+	},
+	"cassandra": {
+		"hosts": "localhost",
+		"keyspace": "event_logger_insights",
+		"cluster": "Test Cluster"
+	},
+	"reports_db": {
+		"db.username": "nucleus",
+		"db.password": "nucleus",
+		"db.url": "jdbc:postgresql://localhost:5432/nucleus",
+		"db.pool.size": 8,
+		"db.autocommit": true
+	},
+	"kafka.producer.settings": {
+		"bootstrap.servers": "localhost:9092",
+		"key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+		"value.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+		"batch.size": 10,
+		"retries": 2,
+		"linger.ms": 1000,
+		"buffer.memory": 33554432,
+		"producer.topic": "USER-SIGNIN-EVENTS"
+	}
+}
