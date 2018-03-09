@@ -64,24 +64,19 @@ public class QueryConstants {
 	  		+ " WHERE session_id =  ? AND collection_id = ? AND event_name = 'collection.play' AND event_type = 'stop'";
 
   
-  /**********************************************************************************************/
-  
   /*************************** Class Authorized user update *************************************/
 
   public static final String SELECT_AUTHORIZED_USER_EXISTS =  "SELECT * FROM class_authorized_users WHERE class_id = ? AND user_id = ?";
   public static final String INSERT_AUTHORIZED_USER = "INSERT INTO class_authorized_users(class_id,user_id,user_type)VALUES(?,?,?)";
   public static final String UPDATE_AUTHORIZED_USER = "UPDATE class_authorized_users SET user_id = ? WHERE class_id = ? ";
- 
-  /**********************************************************************************************/
   
   /*************************** Content update **************************************************/
 
   public static final String INSERT_CONTENT = "INSERT INTO content(id,content_format,title, tax_subject_id,class_code, taxonomy)VALUES(?,?,?,?,?,?)";
   public static final String UPDATE_CONTENT = "UPDATE content SET title = ?, tax_subject_id = ?, taxonomy = ? WHERE id = ? ";
- 
-  /**********************************************************************************************/
 
   /*************************** Class Member update **************************************************/
+
   public static final String INSERT_CLASS_MEMEBER = "INSERT INTO class_member (class_id, user_id, class_member_status) VALUES (?,?,?)";
   public static final String DELETE_CLASS_MEMBER = "DELETE FROM class_member WHERE class_id = ? AND user_id = ?";
   
@@ -92,4 +87,9 @@ public class QueryConstants {
   //Once bookmarked, do not delete Bookmarks from learner_bookmarks, even if they are deleted from Core Bookmarks
   //public static final String DELETE_LEARNER_BOOKMARKS = "DELETE FROM learner_bookmarks WHERE id = ?";
   
+/*************************** Update User Activity Table for SignIn/SignOut**************************************************/
+  
+  public static final String INSERT_USER_ACTIVITY = "INSERT INTO user_activity (event_name, user_id, tenant_id, partner_id, tenant_root, "
+  		+ "login_type, user_category, updated_at) VALUES (?,?,?,?,?,?,?,?)";
+
 }

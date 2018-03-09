@@ -1,0 +1,25 @@
+{
+	"log.directory": "/home/gooru/workspace/sbl-login-event-handler/logs",
+	"systemProperties": {
+		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
+		"vertx.metrics.options.enabled": "true",
+		"logback.configurationFile": "/home/gooru/workspace/sbl-login-event-handler/logback.xml"
+	},
+	"db.settings": {
+		"db.username": "nucleus",
+		"db.password": "nucleus",
+		"db.url": "jdbc:postgresql://localhost:5432/nucleus",
+		"db.pool.size": 8,
+		"db.autocommit": false
+	},
+	"kafka.producer.settings": {
+		"bootstrap.servers": "localhost:9092",
+		"key.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+		"value.serializer": "org.apache.kafka.common.serialization.StringSerializer",
+		"batch.size": 10,
+		"retries": 2,
+		"linger.ms": 1000,
+		"buffer.memory": 33554432,
+		"producer.topic": "testing"
+	}
+}
