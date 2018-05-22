@@ -1,0 +1,34 @@
+{
+	"datasources": {
+		"defaultDataSource": {
+			"ds.type": "hikari",
+			"username": "dsuser",
+			"password": "dspass",
+			"autoCommit": false,
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/dsdb",
+			"maximumPoolSize": 5
+		},
+		"coreDataSource": {
+			"ds.type": "hikari",
+			"username": "nucleus",
+			"password": "nucleus",
+			"autoCommit": false,
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/nucleus",
+			"maximumPoolSize": 5
+		},
+		"rgoDataSource": {
+			"ds.type": "hikari",
+			"username": "dsuser",
+			"password": "dspass",
+			"autoCommit": false,
+			"jdbcUrl": "jdbc:postgresql://localhost:5432/dsdb",
+			"maximumPoolSize": 5
+		}
+	},
+	"app.configuration": {
+		
+	},
+	"systemProperties": {
+		"logback.configurationFile": "src/main/resources/logback-dap-jobs.xml"
+	}
+}

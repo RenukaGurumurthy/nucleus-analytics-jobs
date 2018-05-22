@@ -1,0 +1,67 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "2.0.2"
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url = 'http://oss.sonatype.org/content/repositories/snapshots/'
+    }
+}
+
+if (!JavaVersion.current().java8Compatible) {
+    throw new IllegalStateException('''The build needs Java 8. You are using something else, try again.'''.stripMargin())
+}
+
+ext {
+    poiVersion = '3.17'
+    junitVersion = '4.12'
+    logbackVersion = '1.2.3'
+    hikariVersion = '2.7.6'
+    postgresVersion = '42.2.2'
+    jdbiVersion = '2.78'
+    jacksonVersion = '2.9.5'
+}
+
+
+
+dependencies {
+    compile "org.apache.poi:poi:${poiVersion}"
+    compile "org.apache.poi:poi-ooxml:${poiVersion}"
+    compile "ch.qos.logback:logback-classic:${logbackVersion}"
+    compile "com.zaxxer:HikariCP:${hikariVersion}"
+    compile "org.postgresql:postgresql:${postgresVersion}"
+    compile "org.jdbi:jdbi:${jdbiVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+
+    // Test dependencies
+    testCompile "junit:junit:${junitVersion}"
+}
+
+defaultTasks 'shadowJar'
+
+tasks.withType(JavaCompile) {
+    options.fork = true
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    //enable incremental compilation
+    options.incremental = true
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+
+}
+
+shadowJar {
+    classifier = 'fat'
+    manifest {
+        attributes 'Main-Class': 'org.gooru.dap.jobs.AppRunner'
+        attributes 'Created-By': 'Gooru.org'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4'
+}
+
