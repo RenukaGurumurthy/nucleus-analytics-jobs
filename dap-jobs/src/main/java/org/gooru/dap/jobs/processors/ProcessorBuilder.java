@@ -23,7 +23,7 @@ public enum ProcessorBuilder {
             new NucleusUserCompetencyStatusProcessor().process();
         }
     },
-    DAP_LEARNER_PROFILE_COMPETENCY_STAUS("dap.learner.profile.competency.status") {
+    DAP_LEARNER_PROFILE_COMPETENCY_STATUS("dap.learner.profile.competency.status") {
 
         @Override
         public void build() {
@@ -34,7 +34,7 @@ public enum ProcessorBuilder {
 
         @Override
         public void build() {
-            new RgoCompetencyMatrix().process();
+            new RgoUserCompetencyMatrix().process();
         }
     };
 

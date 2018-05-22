@@ -33,10 +33,15 @@ class NucleusUserCompetencyStatusProcessor implements Processor {
         if (filePath != null) {
             LOGGER.info("Nucleus - User Competency Status Data ingestion job started...");
             File folder = new File(filePath);
-            for (final File file : folder.listFiles()) {
-                readExcelSheetAndUpdate(file);
+            if (folder.exists()) {
+                for (final File file : folder.listFiles()) {
+                    readExcelSheetAndUpdate(file);
+                }
+                LOGGER.info("Nucleus - User Competency Status Data ingestion job completed...");
+            } else {
+                LOGGER.error("File not found, check the file path");
             }
-            LOGGER.info("Nucleus - User Competency Status Data ingestion job completed...");
+
         } else {
             LOGGER.error("Data ingestion filepath should not be null");
 

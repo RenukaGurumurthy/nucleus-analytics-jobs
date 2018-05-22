@@ -20,9 +20,9 @@ import org.skife.jdbi.v2.Handle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class RgoCompetencyMatrix implements Processor {
+class RgoUserCompetencyMatrix implements Processor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RgoCompetencyMatrix.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RgoUserCompetencyMatrix.class);
 
     private static final DBI DBI_RGO = DBICreator.getDbiForRgoDS();
 
@@ -32,10 +32,14 @@ class RgoCompetencyMatrix implements Processor {
         if (filePath != null) {
             LOGGER.info("RGO -  User Competency Matrix Data ingestion job started...");
             File folder = new File(filePath);
+            if (folder.exists()) {
             for (final File file : folder.listFiles()) {
                 readExcelSheetAndUpdate(file);
             }
             LOGGER.info("RGO - User Competency Matrix Data ingestion job completed...");
+            } else { 
+                LOGGER.error("File not found, check the file path");
+            }
         } else {
             LOGGER.error("Data ingestion filepath should not be null");
 
