@@ -10,7 +10,7 @@ public interface UserDao {
     @RegisterMapper(UserMapper.class)
     UserBean findUserByEmailOrRef(@Bind("id") String id);
 
-    @SqlQuery("select id::text, email, username, reference_id from users where id = :id")
+    @SqlQuery("select id::text, email, username, reference_id from users where id = :id::uuid")
     @RegisterMapper(UserMapper.class)
     UserBean findUserById(@Bind("id") String id);
 
