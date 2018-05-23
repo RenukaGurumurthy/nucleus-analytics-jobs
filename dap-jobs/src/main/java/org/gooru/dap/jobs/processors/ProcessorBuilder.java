@@ -30,7 +30,7 @@ public enum ProcessorBuilder {
             new DapLearnerProfileCompetencyStatus().process();
         }
     },
-    RGO_USER_COMPETENCY_MATRIX("user.competency.matrix") {
+    RGO_USER_COMPETENCY_MATRIX("rgo.user.competency.matrix") {
 
         @Override
         public void build() {

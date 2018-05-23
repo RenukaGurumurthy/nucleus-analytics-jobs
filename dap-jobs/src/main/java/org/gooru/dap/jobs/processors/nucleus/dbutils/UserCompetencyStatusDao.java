@@ -9,7 +9,7 @@ import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 public interface UserCompetencyStatusDao {
 
     @SqlBatch("insert into user_competency_status (user_id, comp_mcomp_id, completion_status) values (:userId, :competencyId, :status) "
-        + "ON CONFLICT (user_id, comp_mcomp_id) DO NOTHING;")
+        + "ON CONFLICT (user_id, comp_mcomp_id) DO UPDATE SET completion_status=:status")
     @BatchChunkSize(1000)
     void insertAll(@BindBean Iterator<UserCompetencyStatusBean> userCompetencyStatusBean);
 

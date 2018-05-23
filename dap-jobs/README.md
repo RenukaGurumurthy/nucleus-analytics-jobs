@@ -20,4 +20,4 @@ Learner profile initial setups:
 
 ### RGO 
 
-> java -Djob.name=user.competency.matrix -Ddata.ingestion.filepath=/tmp/lusd-profile-folders -Dconfig.file=./src/main/resources/dap-jobs.json -jar  ./build/libs/dap-jobs-fat.jar
+> java -Djob.name=rgo.user.competency.matrix -Ddata.ingestion.filepath=/tmp/lusd-profile-folders -Dconfig.file=./src/main/resources/dap-jobs.json -jar  ./build/libs/dap-jobs-fat.jar
