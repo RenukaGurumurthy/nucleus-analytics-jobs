@@ -1,0 +1,21 @@
+{
+	"systemProperties": {
+		"vertx.logger-delegate-factory-class-name": "io.vertx.core.logging.SLF4JLogDelegateFactory",
+		"vertx.metrics.options.enabled": "true",
+		"logback.configurationFile": "/home/gooru/data/gooru/code/nucleus-analytics-jobs/login-count-reports/logback.xml"
+	},
+	"core_db": {
+		"db.username": "nucleus",
+		"db.password": "nucleus",
+		"db.url": "jdbc:postgresql://localhost:5432/nucleus",
+		"db.pool.size": 8,
+		"db.autocommit": false
+	},
+	"reports_db": {
+		"db.username": "nucleus",
+		"db.password": "nucleus",
+		"db.url": "jdbc:postgresql://localhost:5432/nucleus",
+		"db.pool.size": 8,
+		"db.autocommit": false
+	}
+}
